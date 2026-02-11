@@ -1,0 +1,401 @@
+<div class="dashboard-wrapper">
+  <!-- Top Navigation Bar -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="logo">
+        <img src="assets/booking.png" alt="dpBooking Logo" class="logo-image" />
+      </div>
+      <div class="nav-toggle" (click)="toggleSidebar()">
+        <i class="toggle-icon">☰</i>
+      </div>
+    </div>
+
+    <div class="navbar-actions">
+      <!-- User Profile -->
+      <div class="user-profile" (click)="toggleUserMenu()">
+        <div class="user-avatar">
+          <i class="avatar-icon">👤</i>
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ userName }}</span>
+          <span class="user-role">{{ userRole }}</span>
+        </div>
+        <i class="dropdown-icon">▼</i>
+
+        <!-- User Dropdown Menu -->
+        <div class="user-dropdown" [class.show]="showUserMenu">
+          <a class="dropdown-item" (click)="viewProfile()">
+            <i class="item-icon">👤</i>
+            <span>الملف الشخصي</span>
+          </a>
+          <a class="dropdown-item" (click)="changePassword()">
+            <i class="item-icon">🔑</i>
+            <span>تغيير كلمة المرور</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item logout" (click)="logout()">
+            <i class="item-icon">🚪</i>
+            <span>تسجيل الخروج</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Sidebar (Collapsible) -->
+    <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+      <div class="sidebar-menu">
+        <a class="menu-item active" (click)="navigateTo('dashboard')">
+          <i class="menu-icon">🏠</i>
+          <span class="menu-text" *ngIf="!sidebarCollapsed">لوحة التحكم</span>
+        </a>
+
+        <div class="menu-section" *ngIf="!sidebarCollapsed">
+          <span class="section-title">الحجوزات</span>
+        </div>
+        <a class="menu-item" (click)="navigateTo('bookings')">
+          <i class="menu-icon">📋</i>
+          <span class="menu-text" *ngIf="!sidebarCollapsed">جميع الحجوزات</span>
+        </a>
+        <a class="menu-item" (click)="navigateTo('/bookings/new')">
+          <i class="menu-icon">➕</i>
+          <span class="menu-text" *ngIf="!sidebarCollapsed">حجز جديد</span>
+        </a>
+        <a class="menu-item" (click)="navigateTo('calendar')">
+          <i class="menu-icon">📅</i>
+          <span class="menu-text" *ngIf="!sidebarCollapsed">التقويم</span>
+        </a>
+
+        <div class="menu-section" *ngIf="!sidebarCollapsed">
+          <span class="section-title">التقارير</span>
+        </div>
+        <a class="menu-item" (click)="navigateTo('bookings/print')">
+          <i class="menu-icon">📊</i>
+          <span class="menu-text" *ngIf="!sidebarCollapsed">التقارير</span>
+        </a>
+        <a class="menu-item" (click)="navigateTo('analytics')">
+          <i class="menu-icon">📈</i>
+          <span class="menu-text" *ngIf="!sidebarCollapsed">التحليلات</span>
+        </a>
+
+        <div class="menu-section" *ngIf="!sidebarCollapsed">
+          <span class="section-title">الإعدادات</span>
+        </div>
+        <a class="menu-item" (click)="navigateTo('settings')">
+          <i class="menu-icon">⚙️</i>
+          <span class="menu-text" *ngIf="!sidebarCollapsed">الإعدادات</span>
+        </a>
+        <a class="menu-item" (click)="navigateTo('users')" *ngIf="isAdmin">
+          <i class="menu-icon">👥</i>
+          <span class="menu-text" *ngIf="!sidebarCollapsed">المستخدمين</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer" *ngIf="!sidebarCollapsed">
+        <div class="sidebar-logo">
+          <img src="assets/booking.png" alt="dpBooking" class="footer-logo" />
+          <span class="logo-name">dpBooking</span>
+        </div>
+        <div class="system-status">
+          <div class="status-indicator online"></div>
+          <span>النظام متصل</span>
+        </div>
+        <div class="version">الإصدار 2.0.1</div>
+      </div>
+    </aside>
+
+    <!-- Content Area -->
+    <div class="content-area">
+      <!-- Welcome Section -->
+      <div class="welcome-card">
+        <div class="welcome-inner">
+          <div class="welcome-content">
+            <h1 class="welcome-title">مرحباً {{ userName }} 👋</h1>
+            <span class="role-badge">
+              {{ userRole }}
+            </span>
+            <p class="welcome-message">
+              إدارة حجوزات رمضان - اليوم {{ currentDate | date: "dd MMMM" }}
+            </p>
+          </div>
+
+          <div class="welcome-actions">
+            <button class="primary-btn" (click)="createBooking()">
+              <i class="btn-icon">➕</i>
+              <span>حجز جديد</span>
+            </button>
+
+            <button
+              class="secondary-btn iftar-btn"
+              (click)="printStationReport(5, 'إفطار رمضان')"
+              title="طباعة تقرير محطات الإفطار"
+            >
+              <i class="btn-icon">🕌</i>
+              <span>تقرير الإفطار اليومي</span>
+            </button>
+
+            <button
+              class="secondary-btn suhur-btn"
+              (click)="printStationReport(6, 'سحور رمضان')"
+              title="طباعة تقرير محطات السحور"
+            >
+              <i class="btn-icon">🌙</i>
+              <span>تقرير السحور اليومي</span>
+            </button>
+
+            <button
+              class="secondary-btn full-report-btn"
+              (click)="printFullDayReport()"
+              [disabled]="bookings.length === 0"
+            >
+              <i class="btn-icon">📊</i>
+              <span>تقرير اليوم الكامل</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon total-bookings">
+              <i>📋</i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">{{ todayStats.totalBookings }}</span>
+              <span class="stat-label">إجمالي الحجوزات</span>
+            </div>
+          </div>
+          <div class="stat-trend" *ngIf="todayStats.trend > 0">
+            <span>+{{ todayStats.trend }}%</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon revenue">
+              <i>💰</i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">{{
+                todayStats.revenue | currency: "EGP" : "symbol" : "1.0-0"
+              }}</span>
+              <span class="stat-label">إجمالي الإيرادات</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon active">
+              <i>✅</i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">{{ todayStats.activeBookings }}</span>
+              <span class="stat-label">حجوزات نشطة</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today's Bookings Table -->
+      <div class="table-card">
+        <!-- Header -->
+        <div class="table-header">
+          <h2 class="table-title">حجوزات اليوم</h2>
+
+          <div class="table-actions">
+            <div class="date-navigation">
+              <button class="nav-btn" (click)="previousDay()">
+                ◀ اليوم السابق
+              </button>
+
+              <div class="date-card">
+                <input
+                  type="text"
+                  class="form-control date-input"
+                  bsDatepicker
+                  [bsValue]="selectedDate"
+                  (bsValueChange)="onDateChange($event)"
+                  [bsConfig]="{
+                    dateInputFormat: 'DD/MM/YYYY',
+                    showWeekNumbers: false
+                  }"
+                  placeholder="اختر التاريخ"
+                />
+              </div>
+
+              <button class="nav-btn" (click)="nextDay()">
+                اليوم التالي ▶
+              </button>
+            </div>
+
+            <div class="table-controls">
+              <button
+                class="control-btn"
+                (click)="refreshBookings()"
+                title="تحديث"
+              >
+                🔄
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading-state" *ngIf="loading">
+          <div class="loader"></div>
+          <span>جاري تحميل الحجوزات...</span>
+        </div>
+
+        <!-- Table Wrapper -->
+        <div class="table-body-wrapper" *ngIf="!loading && bookings.length > 0">
+          <table class="bookings-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>العميل</th>
+                <th>الهاتف</th>
+                <th>النوع</th>
+                <th>المكان</th>
+                <th>الأشخاص</th>
+                <th>التوقيت</th>
+                <th>المبلغ</th>
+                <th>الحالة</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let booking of bookings; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ booking.clientName || booking.customerName }}</td>
+                <td>
+                  {{ booking.clientPhone || booking.phone1 }}
+                  <span *ngIf="booking.clientMobile || booking.phone2">
+                    / {{ booking.clientMobile || booking.phone2 }}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    class="booking-type-badge"
+                    [ngClass]="getBookingTypeClass(booking.bookingType)"
+                  >
+                    {{ getBookingTypeText(booking.bookingType) }}
+                  </span>
+                </td>
+                <td>{{ getVenueName(booking.venueId) }}</td>
+                <td>{{ booking.guestsCount || booking.numberOfGuests }}</td>
+                <td>
+                  {{ formatTime(booking.bookingTime) }}
+                  <span *ngIf="!isToday(booking.bookingDate)">
+                    {{ booking.bookingDate | date: "dd/MM" }}
+                  </span>
+                </td>
+                <td>
+                  <div class="amount-cell">
+                    <div>
+                      {{
+                        booking.totalAmount
+                          | currency: "EGP" : "symbol" : "1.0-0"
+                      }}
+                    </div>
+                    <div
+                      class="payment-status"
+                      [class.paid]="
+                        (booking.depositAmount || 0) ===
+                        (booking.totalAmount || 0)
+                      "
+                      [class.partial]="
+                        (booking.depositAmount || 0) > 0 &&
+                        (booking.depositAmount || 0) <
+                          (booking.totalAmount || 0)
+                      "
+                    >
+                      {{
+                        booking.depositAmount || 0
+                          | currency: "EGP" : "symbol" : "1.0-0"
+                      }}
+                      مدفوع
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span
+                    class="status-badge"
+                    [ngClass]="getStatusClass(booking.bookingStatus)"
+                  >
+                    {{ getStatusText(booking.bookingStatus) }}
+                  </span>
+                </td>
+
+                <td>
+                  <button
+                    class="simple-menu"
+                    (click)="openMenu(booking, $event)"
+                  >
+                    ☰
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Floating menu - مصحح -->
+          <div
+            class="floating-menu"
+            *ngIf="activeMenuBooking"
+            [ngStyle]="{
+              'top.px': menuPosition.top,
+              'left.px': menuPosition.left
+            }"
+            (click)="$event.stopPropagation()"
+          >
+            <button
+              *ngIf="
+                activeMenuBooking.bookingStatus !== 3 &&
+                activeMenuBooking.bookingStatus !== 5
+              "
+              (click)="editBooking(activeMenuBooking)"
+            >
+              ✏️ تعديل
+            </button>
+            <button (click)="print()">🖨️ طباعة</button>
+            <button
+              *ngIf="activeMenuBooking.bookingStatus === 0"
+              (click)="confirmBooking(activeMenuBooking)"
+            >
+              ✅ تأكيد
+            </button>
+            <button
+              *ngIf="
+                activeMenuBooking.bookingStatus === 0 ||
+                activeMenuBooking.bookingStatus === 1
+              "
+              (click)="cancelBooking(activeMenuBooking)"
+            >
+              ❌ إلغاء
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="!loading && bookings.length === 0">
+          📋 لا توجد حجوزات لهذا اليوم
+          <button class="primary-btn" (click)="createBooking()">
+            ➕ إضافة حجز جديد
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification - مصحح -->
+  <div class="toast" [class.show]="showToast" [ngClass]="toastType">
+    <i class="toast-icon">{{ toastIcon }}</i>
+    <span class="toast-text">{{ toastMessage }}</span>
+    <button class="toast-close" (click)="hideToast()">✕</button>
+  </div>
+</div>

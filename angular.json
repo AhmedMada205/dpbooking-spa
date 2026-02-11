@@ -28,9 +28,23 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+                "node_modules/bootstrap/dist/css/bootstrap.min.css",
+  "node_modules/font-awesome/css/font-awesome.min.css",
+  "node_modules/ngx-bootstrap/datepicker/bs-datepicker.scss",
+  "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+  "src/styles.scss"
+            
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/popper.js/dist/umd/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets/scss"
+              ]
+            }
           },
           "configurations": {
             "production": {
@@ -51,28 +65,46 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+                  "maximumWarning": "10mb",
+                  "maximumError": "30mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb",
-                  "maximumError": "10kb"
+                  "maximumWarning": "30kb",
+                  "maximumError": "80kb"
                 }
               ]
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
             }
-          }
+          },
+          "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "dpbooking-spa:build"
+            "browserTarget": "dpbooking-spa:build",
+            "port": 4200,
+            "host": "localhost",
+            "open": true,
+            "liveReload": true,
+            "hmr": false
           },
           "configurations": {
             "production": {
               "browserTarget": "dpbooking-spa:build:production"
+            },
+            "development": {
+              "browserTarget": "dpbooking-spa:build:development"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
@@ -92,9 +124,17 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+             "node_modules/bootstrap/dist/css/bootstrap.min.css",
+  "node_modules/font-awesome/css/font-awesome.min.css",
+  "node_modules/ngx-bootstrap/datepicker/bs-datepicker.scss",
+  "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+  "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/popper.js/dist/umd/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ]
           }
         },
         "lint": {
@@ -123,6 +163,11 @@
           }
         }
       }
-    }},
-  "defaultProject": "dpbooking-spa"
+    }
+  },
+  "defaultProject": "dpbooking-spa",
+  "cli": {
+    "analytics": false,
+    "packageManager": "npm"
+  }
 }

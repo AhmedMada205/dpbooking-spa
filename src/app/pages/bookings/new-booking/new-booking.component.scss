@@ -1,0 +1,64 @@
+.booking-card {
+  border-radius: 18px;
+}
+
+.booking-header {
+  background: linear-gradient(135deg, #397a88, #2f5f6a);
+  color: #fff;
+}
+
+.section-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 22px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.section-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: #397a88;
+  margin-bottom: 16px;
+  padding-right: 12px;
+  border-right: 4px solid #397a88;
+  display: flex;
+  align-items: center;
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+.form-control {
+  border-radius: 8px;
+}
+
+.meal-card {
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  padding: 15px;
+  transition: 0.2s ease;
+}
+
+.meal-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.summary-card {
+  background: #f8f9fa;
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.summary-row.final {
+  font-size: 18px;
+  font-weight: 700;
+  color: #397a88;
+}

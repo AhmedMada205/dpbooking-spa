@@ -1,0 +1,431 @@
+<!-- bookingsprint.component.html -->
+<div class="print-page-container" dir="rtl">
+  
+  <!-- ==================== HEADER ==================== -->
+  <div class="page-header no-print">
+    <div class="header-content">
+      <div class="header-title">
+        <div class="header-icon">🖨️</div>
+        <div class="header-text">
+          <h1>مركز الطباعة والتقارير المتقدم</h1>
+          <div class="header-subtitle">
+            <span class="report-id">🕒 {{currentTime | date: 'HH:mm:ss'}}</span>
+            <span class="report-date">📅 {{currentTime | date: 'yyyy/MM/dd'}}</span>
+            <span class="total-count">📊 {{filteredBookings.length}} حجز</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button class="btn btn-back" (click)="goBack()">
+          <span class="btn-icon">↰</span>
+          <span class="btn-text">العودة للحجوزات</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== FILTERS SECTION ==================== -->
+  <div class="filters-section no-print">
+    <div class="section-header">
+      <h2>
+        <span class="section-icon">⚙️</span>
+        <span class="section-title">تهيئة التقرير</span>
+      </h2>
+    </div>
+    
+    <div class="filters-grid">
+      <!-- Date Selection -->
+      <div class="filter-card date-filter">
+        <div class="filter-header">
+          <span class="filter-icon">📅</span>
+          <h3>اختر التاريخ</h3>
+        </div>
+        <div class="filter-body">
+          <div class="date-input-wrapper">
+            <label for="filterDate" class="input-label">تاريخ الحجز</label>
+            <div class="input-group">
+              <input type="date" id="filterDate" 
+                     [ngModel]="filterDate"
+                     (ngModelChange)="changeDate($event)"
+                     class="date-input"
+                     title="اختر تاريخ الحجوزات">
+              <span class="input-icon">📅</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Options -->
+      <div class="filter-card options-filter">
+        <div class="filter-header">
+          <span class="filter-icon">🎯</span>
+          <h3>خيارات الفلترة</h3>
+        </div>
+        <div class="filter-body">
+          <div class="filter-grid">
+            <div class="form-group">
+              <label class="form-label">نوع الحجز</label>
+              <div class="select-wrapper">
+                <select [ngModel]="filterType" (ngModelChange)="changeType($event)" class="form-select">
+                  <option value="all">الكل</option>
+                  <option value="5">إفطار رمضان</option>
+                  <option value="6">سحور رمضان</option>
+                </select>
+                <span class="select-icon">▼</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">حالة الحجز</label>
+              <div class="select-wrapper">
+                <select [ngModel]="filterStatus" (ngModelChange)="changeStatus($event)" class="form-select">
+                  <option value="all">الكل</option>
+                  <option value="0">قيد الانتظار</option>
+                  <option value="3">مؤجل</option>
+                  <option value="2">ملغي</option>
+                  <option value="1">مؤكد</option>
+                  <option value="4">مؤجل</option>
+                </select>
+                <span class="select-icon">▼</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">المكان</label>
+              <div class="select-wrapper">
+                <select [ngModel]="filterVenue" (ngModelChange)="changeVenue($event)" class="form-select">
+                  <option value="all">الكل</option>
+                  <option *ngFor="let venue of venues" [value]="venue.id || venue.venueId">
+                    {{venue.name || venue.venueName}}
+                  </option>
+                </select>
+                <span class="select-icon">▼</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="filter-card quick-actions-filter">
+        <div class="filter-header">
+          <span class="filter-icon">🚀</span>
+          <h3>طباعة سريعة</h3>
+        </div>
+        <div class="filter-body">
+          <div class="quick-actions-grid">
+            <button class="quick-action-btn iftar-btn" (click)="changeType('RamadanIftar'); applyFilters()">
+              <span class="action-icon">🍽️</span>
+              <span class="action-text">إفطار اليوم</span>
+            </button>
+            <button class="quick-action-btn suhur-btn" (click)="changeType('RamadanSuhoor'); applyFilters()">
+              <span class="action-icon">🌙</span>
+              <span class="action-text">سحور اليوم</span>
+            </button>
+            <button class="quick-action-btn station-btn" (click)="changeTemplate('station'); printReport()">
+              <span class="action-icon">📍</span>
+              <span class="action-text">طباعة توزيع</span>
+            </button>
+            <button class="quick-action-btn kitchen-btn" (click)="changeTemplate('kitchen'); printReport()">
+              <span class="action-icon">👨‍🍳</span>
+              <span class="action-text">طباعة مطبخ</span>
+            </button>
+            <button class="quick-action-btn financial-btn" (click)="changeTemplate('financial'); printReport()">
+              <span class="action-icon">💰</span>
+              <span class="action-text">طباعة مالي</span>
+            </button>
+            <button class="quick-action-btn compact-btn" (click)="changeTemplate('compact'); printReport()">
+              <span class="action-icon">📄</span>
+              <span class="action-text">طباعة البوابة</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TEMPLATES SECTION ==================== -->
+  <div class="templates-section no-print">
+    <div class="section-header">
+      <h2>
+        <span class="section-icon">🎨</span>
+        <span class="section-title">قوالب الطباعة</span>
+      </h2>
+    </div>
+    
+    <div class="templates-grid">
+      <div *ngFor="let template of printTemplates" 
+           [class.active]="activeTemplate === template.id"
+           class="template-card"
+           (click)="changeTemplate(template.id)">
+        <div class="template-card-inner">
+          <div class="template-icon-wrapper">
+            <span class="template-icon">{{template.icon}}</span>
+          </div>
+          <div class="template-content">
+            <h4 class="template-name">{{template.name}}</h4>
+            <p class="template-desc">{{getTemplateDescription(template.id)}}</p>
+          </div>
+          <div class="template-badge" *ngIf="activeTemplate === template.id">
+            <span class="badge-text">محدد</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== STATISTICS ==================== -->
+  <div class="statistics-section no-print" *ngIf="filteredBookings.length > 0">
+    <div class="section-header">
+      <h2>
+        <span class="section-icon">📊</span>
+        <span class="section-title">ملخص الحجوزات</span>
+      </h2>
+    </div>
+    
+    <div class="stats-container">
+      <div class="stats-cards">
+        <div class="stat-card card-total">
+          <div class="stat-card-inner">
+            <div class="stat-icon-wrapper">
+              <span class="stat-icon">📋</span>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{totalBookings}}</div>
+              <div class="stat-label">عدد الحجوزات</div>
+            </div>
+            <div class="stat-trend" *ngIf="bookings.length > 0">
+              <span class="trend-icon">📈</span>
+              <span class="trend-text">100%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card card-guests">
+          <div class="stat-card-inner">
+            <div class="stat-icon-wrapper">
+              <span class="stat-icon">👥</span>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{totalGuests}}</div>
+              <div class="stat-label">عدد الضيوف</div>
+            </div>
+            <div class="stat-trend">
+              <span class="trend-icon">👤</span>
+              <span class="trend-text">متوسط {{totalGuests / totalBookings | number:'1.0-0'}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card card-amount">
+          <div class="stat-card-inner">
+            <div class="stat-icon-wrapper">
+              <span class="stat-icon">💰</span>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{totalAmount | number}} ج.م</div>
+              <div class="stat-label">الإجمالي</div>
+            </div>
+            <div class="stat-trend">
+              <span class="trend-icon">💵</span>
+              <span class="trend-text">مبلغ</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card card-remaining">
+          <div class="stat-card-inner">
+            <div class="stat-icon-wrapper">
+              <span class="stat-icon">⚖️</span>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{totalRemaining | number}} ج.م</div>
+              <div class="stat-label">المتبقي</div>
+            </div>
+            <div class="stat-trend">
+              <span class="trend-icon">📉</span>
+              <span class="trend-text">الدفع</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report Summary -->
+      <div class="report-summary">
+        <div class="summary-header">
+          <h4>
+            <span class="summary-icon">📝</span>
+            تفاصيل التقرير
+          </h4>
+        </div>
+        <div class="summary-content">
+          <div class="summary-item">
+            <span class="item-label">عنوان التقرير:</span>
+            <span class="item-value">{{reportTitle}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="item-label">التاريخ المحدد:</span>
+            <span class="item-value">{{filterDate ? (filterDate | date: 'yyyy-MM-dd') : 'اليوم'}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="item-label">نوع الحجوزات:</span>
+            <span class="item-value">{{filterType === 'all' ? 'الكل' : getBookingTypeTextFromString(filterType)}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="item-label">حالة الحجوزات:</span>
+            <span class="item-value">{{filterStatus === 'all' ? 'الكل' : filterStatus}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== BOOKINGS LIST ==================== -->
+  <div class="bookings-list-section no-print" *ngIf="filteredBookings.length > 0">
+    <div class="section-header">
+      <h2>
+        <span class="section-icon">📋</span>
+        <span class="section-title">الحجوزات المحددة</span>
+        <span class="section-count">({{filteredBookings.length}})</span>
+      </h2>
+    </div>
+    
+    <div class="table-container">
+      <table class="bookings-table">
+        <thead>
+          <tr>
+            <th class="col-index">#</th>
+            <th class="col-client">العميل</th>
+            <th class="col-phone">الهاتف</th>
+            <th class="col-time">الوقت</th>
+            <th class="col-guests">الضيوف</th>
+            <th class="col-venue">المكان</th>
+            <th class="col-status">الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let booking of filteredBookings; let i = index">
+            <td class="col-index">{{i + 1}}</td>
+            <td class="col-client">
+              <div class="client-info">
+                <div class="client-name">{{booking.clientName || '---'}}</div>
+                <div class="booking-id">#{{booking.bookingId || '---'}}</div>
+              </div>
+            </td>
+            <td class="col-phone">{{booking.clientPhone || '---'}}</td>
+            <td class="col-time">{{formatTime(booking.bookingTime)}}</td>
+            <td class="col-guests">
+              <span class="guests-count">{{booking.guestsCount || 0}}</span>
+            </td>
+            <td class="col-venue">{{getVenueName(booking.venueId)}}</td>
+            <td class="col-status">
+              <span class="status-badge" [class]="getStatusClass(booking.bookingStatus)">
+                {{getStatusText(booking.bookingStatus)}}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== NO DATA ==================== -->
+  <div *ngIf="!loading && filteredBookings.length === 0" class="no-data-section no-print">
+    <div class="no-data-content">
+      <div class="no-data-icon">📭</div>
+      <h3 class="no-data-title">لا توجد حجوزات</h3>
+      <p class="no-data-message">لا توجد حجوزات تطابق معايير الفلترة المحددة</p>
+      <button class="btn-reset" (click)="filterType = 'all'; filterStatus = 'all'; filterVenue = 'all'; applyFilters()">
+        <span class="btn-icon">🔄</span>
+        <span class="btn-text">إعادة تعيين الفلاتر</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== LOADING ==================== -->
+  <div *ngIf="loading" class="loading-section no-print">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <h3 class="loading-title">جاري تحميل الحجوزات</h3>
+      <p class="loading-message">يرجى الانتظار...</p>
+    </div>
+  </div>
+
+  <!-- ==================== ACTION BUTTONS ==================== -->
+  <div class="action-buttons no-print" *ngIf="filteredBookings.length > 0">
+    <div class="actions-container">
+      <div class="main-action">
+        <button class="btn-action btn-primary" (click)="printReport()" [disabled]="loading">
+          <span class="btn-icon">🖨️</span>
+          <span class="btn-text">طباعة {{getTemplateName(activeTemplate)}}</span>
+        </button>
+      </div>
+      
+      <div class="secondary-actions">
+        <div class="action-group">
+          <button class="btn-action btn-station" (click)="changeTemplate('station'); printReport()">
+            <span class="btn-icon">📍</span>
+            <span class="btn-text">طباعة توزيع</span>
+          </button>
+          <button class="btn-action btn-kitchen" (click)="changeTemplate('kitchen'); printReport()">
+            <span class="btn-icon">👨‍🍳</span>
+            <span class="btn-text">طباعة مطبخ</span>
+          </button>
+          <button class="btn-action btn-financial" (click)="changeTemplate('financial'); printReport()">
+            <span class="btn-icon">💰</span>
+            <span class="btn-text">طباعة مالي</span>
+          </button>
+          <button class="btn-action btn-compact" (click)="changeTemplate('compact'); printReport()">
+            <span class="btn-icon">📄</span>
+            <span class="btn-text">طباعة البوابة</span>
+          </button>
+        </div>
+        
+        <div class="utility-actions">
+          <button class="btn-action btn-refresh" (click)="applyFilters()">
+            <span class="btn-icon">🔄</span>
+            <span class="btn-text">تحديث البيانات</span>
+          </button>
+          <button class="btn-action btn-clear" (click)="filterType = 'all'; filterStatus = 'all'; filterVenue = 'all'; applyFilters()">
+            <span class="btn-icon">🗑️</span>
+            <span class="btn-text">مسح الفلاتر</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <div class="page-footer no-print">
+    <div class="footer-container">
+      <div class="footer-left">
+        <div class="system-info">
+          <span class="system-icon">⚡</span>
+          <span class="system-name">نظام إدارة الحجوزات المتقدم</span>
+        </div>
+        <div class="version-info">
+          <span class="version-label">آخر تحديث:</span>
+          <span class="version-value">{{currentTime | date: 'HH:mm:ss'}}</span>
+        </div>
+      </div>
+      
+      <div class="footer-right">
+        <div class="footer-stats">
+          <div class="stat-item">
+            <span class="stat-icon">💾</span>
+            <span class="stat-value">{{bookings.length}} حجوزات</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">📊</span>
+            <span class="stat-value">{{filteredBookings.length}} مفلتر</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">🖨️</span>
+            <span class="stat-value">{{printTemplates.length}} قالب</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

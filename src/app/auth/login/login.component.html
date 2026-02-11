@@ -1,0 +1,145 @@
+<div class="login-wrapper">
+  <div class="login-container">
+
+    <!-- Left Branding -->
+    <div class="branding-section">
+      <div class="branding-content">
+        <div class="logo-container">
+          <div class="logo">
+  <img src="assets/booking.png" alt="dpBooking Logo" class="logo-image">
+</div>
+          <div class="logo-glow"></div>
+        </div>
+      
+        <p class="brand-tagline">الحل الأمثل لإدارة الحجوزات</p>
+        
+        <div class="features">
+          <div class="feature">
+            <i>✓</i>
+            <span>إدارة حجوزات ذكية</span>
+          </div>
+          <div class="feature">
+            <i>✓</i>
+            <span>لوحة تحكم متكاملة</span>
+          </div>
+          <div class="feature">
+            <i>✓</i>
+            <span>أداء سريع ومستقر</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Form -->
+    <div class="form-section">
+
+      <!-- Welcome -->
+      <div class="welcome-section">
+        <h2 class="welcome-title">مرحباً بعودتك</h2>
+        <p class="welcome-subtitle">سجل الدخول للوصول إلى لوحة التحكم</p>
+      </div>
+
+      <form #loginForm="ngForm" (ngSubmit)="login()" class="login-form">
+
+        <!-- Username -->
+        <div class="form-group">
+          <label class="form-label">اسم المستخدم</label>
+          <div class="input-container">
+            <input
+              type="text"
+              name="userName"
+              [(ngModel)]="credentials.userName"
+              required
+              placeholder="أدخل اسم المستخدم"
+              class="form-input" />
+            <i class="input-icon">👤</i>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label class="form-label">كلمة المرور</label>
+          <div class="input-container">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              name="password"
+              [(ngModel)]="credentials.password"
+              required
+              placeholder="أدخل كلمة المرور"
+              class="form-input" />
+            <i class="input-icon">🔒</i>
+            <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+              <i>{{ showPassword ? '👁️' : '👁️‍🗨️' }}</i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="form-options">
+          <label class="checkbox-container">
+            <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe">
+            <span class="checkmark"></span>
+            <span class="option-text">تذكرني</span>
+          </label>
+          
+          <a href="#" class="forgot-link">نسيت كلمة المرور؟</a>
+        </div>
+
+        <!-- Error -->
+        <div class="error-message" *ngIf="errorMessage">
+          <i>⚠️</i>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <!-- Button -->
+        <button
+          type="submit"
+          class="login-btn"
+          [disabled]="loginForm.invalid || isLoading">
+
+          <div class="btn-content">
+            <span *ngIf="!isLoading">تسجيل الدخول</span>
+            <span *ngIf="isLoading">جاري التحقق...</span>
+            <i class="btn-icon" *ngIf="!isLoading">→</i>
+            <div class="spinner" *ngIf="isLoading"></div>
+          </div>
+        </button>
+
+        <!-- Demo Credentials -->
+        <div class="demo-section" *ngIf="showDemo">
+          <div class="demo-title">
+            <i>🔑</i>
+            <span>بيانات تجريبية</span>
+          </div>
+          <div class="demo-credentials">
+            <div class="demo-item">
+              <span>المستخدم:</span>
+              <strong>admin</strong>
+            </div>
+            <div class="demo-item">
+              <span>كلمة المرور:</span>
+              <strong>admin123</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="form-footer">
+          <span class="copyright">© {{ currentYear }} devpioneers</span>
+          <div class="security-badge">
+            <i>🛡️</i>
+            <span>اتصال آمن</span>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" *ngIf="showToast">
+    <i>✅</i>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>

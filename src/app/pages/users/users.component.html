@@ -1,0 +1,188 @@
+<div class="users-container">
+  <!-- Header -->
+  <div class="header">
+    <h2>👥 إدارة المستخدمين</h2>
+    <button routerLink="/users/new" class="btn-add">
+      <i>➕</i>
+      <span>مستخدم جديد</span>
+    </button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-container">
+    <div class="search-box">
+      <input 
+        type="text" 
+        #searchInput
+        placeholder="ابحث عن مستخدم بالاسم، اسم المستخدم، أو البريد..."
+        (keyup.enter)="searchUsers(searchInput.value)"
+      />
+      <button (click)="searchUsers(searchInput.value)">
+        <i>🔍</i>
+        <span>بحث</span>
+      </button>
+      <button (click)="searchInput.value = ''; loadUsers()" class="btn-clear">
+        <i>🔄</i>
+        <span>عرض الكل</span>
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <span class="stat-item">
+        <i>👥</i>
+        <strong>{{ totalUsers }}</strong> مستخدم
+      </span>
+      <span class="stat-item">
+        <i>📄</i>
+        صفحة {{ currentPage }} من {{ totalPages }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <span>جاري تحميل المستخدمين...</span>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="error && !loading">
+    <div class="error-icon">⚠️</div>
+    <h3>حدث خطأ</h3>
+    <p>{{ error }}</p>
+    <button (click)="loadUsers()" class="btn-retry">
+      <i>🔄</i>
+      <span>إعادة المحاولة</span>
+    </button>
+  </div>
+
+  <!-- Users Table -->
+  <div class="table-container" *ngIf="users.length > 0 && !loading">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>اسم المستخدم</th>
+          <th>الاسم الكامل</th>
+          <th>البريد الإلكتروني</th>
+          <th>رقم الهاتف</th>
+          <th>الصلاحية</th>
+          <th>الحالة</th>
+          <th>تاريخ الإنشاء</th>
+          <th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users; let i = index">
+          <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+          <td>
+            <div class="user-cell">
+              <div class="user-avatar">{{ user.firstName?.charAt(0) }}</div>
+              <div class="user-info">
+                <strong>{{ user.userName }}</strong>
+              </div>
+            </div>
+          </td>
+          <td>{{ user.firstName }} {{ user.lastName }}</td>
+          <td>{{ user.email || 'غير محدد' }}</td>
+          <td>{{ user.phone || 'غير محدد' }}</td>
+          <td>
+            <span class="role-badge" [class]="'role-' + user.role.toLowerCase()">
+              {{ user.role }}
+            </span>
+          </td>
+          <td>
+            <span class="status-badge" [class.active]="user.isActive" [class.inactive]="!user.isActive">
+              {{ user.isActive ? 'نشط' : 'غير نشط' }}
+            </span>
+          </td>
+          <td>{{ user.createdAt | date:'yyyy/MM/dd' }}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-action view" [routerLink]="['/users', user.id]" title="عرض">
+                <i>👁️</i>
+              </button>
+              <button class="btn-action edit" [routerLink]="['/users/edit', user.id]" title="تعديل">
+                <i>✏️</i>
+              </button>
+              <button 
+                class="btn-action toggle-status" 
+                [class.deactivate]="user.isActive"
+                [class.activate]="!user.isActive"
+                (click)="toggleUserStatus(user)"
+                [title]="user.isActive ? 'تعطيل' : 'تفعيل'"
+              >
+                <i>{{ user.isActive ? '⏸️' : '▶️' }}</i>
+              </button>
+              <button 
+                class="btn-action delete" 
+                (click)="deleteUser(user)"
+                title="حذف"
+                *ngIf="user.role !== 'Admin'"
+              >
+                <i>🗑️</i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="users.length === 0 && !loading && !error">
+    <div class="empty-icon">👥</div>
+    <h3>لا توجد مستخدمين</h3>
+    <p>لم يتم العثور على أي مستخدمين مطابقين للبحث</p>
+    <button routerLink="/users/new" class="btn-add-first">
+      <i>➕</i>
+      <span>إضافة مستخدم جديد</span>
+    </button>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1 && !loading">
+    <button 
+      class="page-btn" 
+      [disabled]="currentPage === 1"
+      (click)="previousPage()"
+    >
+      <i>◀</i>
+      <span>السابق</span>
+    </button>
+    
+    <div class="page-numbers">
+      <button 
+        *ngFor="let page of getPageNumbers()"
+        class="page-number"
+        [class.active]="page === currentPage"
+        (click)="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+      
+      <span *ngIf="totalPages > 5 && currentPage < totalPages - 2">...</span>
+    </div>
+    
+    <button 
+      class="page-btn" 
+      [disabled]="currentPage === totalPages"
+      (click)="nextPage()"
+    >
+      <span>التالي</span>
+      <i>▶</i>
+    </button>
+    
+    <div class="page-size-selector">
+      <label>عرض:</label>
+      <select [(ngModel)]="pageSize" (change)="currentPage = 1; loadUsers()">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+      </select>
+      <span>لكل صفحة</span>
+    </div>
+  </div>
+</div>
