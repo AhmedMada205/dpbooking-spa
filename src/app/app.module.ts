@@ -19,6 +19,7 @@ import { EditBookingComponent } from './pages/bookings/edit-booking/edit-booking
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -36,18 +37,17 @@ import { RouterModule } from '@angular/router';
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     AppRoutingModule,
     HttpClientModule ,
     ReactiveFormsModule, // ⬅️ مهم للفورمز التفاعلية
     FormsModule,    // 👈 لازم
-    BrowserAnimationsModule,   // ⬅️ مهم
     ToastrModule.forRoot(),
     BrowserAnimationsModule,
-      BsDatepickerModule.forRoot(), // 👈 مهم جداً
-
+    BsDatepickerModule.forRoot() // 👈 مهم جداً
   
   ],
-  providers: [AuthGuard, Location ],
+  providers: [AuthGuard, Location,BookingsComponent ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,64 +1,334 @@
+/* =====================================================
+   Booking Page – Professional SCSS
+   Angular 10 + Bootstrap 4.6
+   RTL Supported
+===================================================== */
+
+.booking-wrapper {
+  background: #f4f6f9;
+  min-height: 100vh;
+}
+
+/* =====================================================
+   Card Main
+===================================================== */
 .booking-card {
   border-radius: 18px;
+  overflow: hidden;
+  background: #ffffff;
+  transition: all .3s ease;
+
+  .card-body {
+    background: #fafbfc;
+  }
 }
 
+/* =====================================================
+   Header
+===================================================== */
 .booking-header {
-  background: linear-gradient(135deg, #397a88, #2f5f6a);
+  background: linear-gradient(135deg, #397A88, #2c5f6b);
   color: #fff;
+  border-bottom: none;
+
+  h4 {
+    font-size: 20px;
+  }
+
+  .header-icon {
+    width: 55px;
+    height: 55px;
+    background: rgba(255,255,255,.15);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-circle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    padding: 0;
+  }
+
+  .btn-outline-light {
+    border-width: 1.5px;
+  }
 }
 
-.section-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 22px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-}
-
+/* =====================================================
+   Section Titles
+===================================================== */
 .section-title {
-  font-weight: 600;
-  font-size: 15px;
-  color: #397a88;
-  margin-bottom: 16px;
-  padding-right: 12px;
-  border-right: 4px solid #397a88;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eef2f5;
+  color: #397A88;
   display: flex;
   align-items: center;
+
+  i {
+    color: #c18700;
+  }
 }
 
+/* =====================================================
+   Inner Cards
+===================================================== */
+.card.shadow-sm {
+  border-radius: 14px;
+  transition: all .25s ease;
+
+  &:hover {
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* =====================================================
+   Form Controls
+===================================================== */
 .form-label {
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.required::after {
+  content: " *";
+  color: #dc3545;
+  font-weight: bold;
 }
 
 .form-control {
   border-radius: 8px;
+  height: 42px;
+  font-size: 14px;
+  border: 1px solid #e3e7ed;
+  transition: all .2s ease;
+
+  &:focus {
+    border-color: #397A88;
+    box-shadow: 0 0 0 0.1rem rgba(57, 122, 136, 0.25);
+  }
 }
 
-.meal-card {
-  border: 1px solid #e9ecef;
-  border-radius: 14px;
-  padding: 15px;
-  transition: 0.2s ease;
+textarea.form-control {
+  height: auto;
 }
 
-.meal-card:hover {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+select.form-control {
+  cursor: pointer;
 }
 
+/* =====================================================
+   Input Groups
+===================================================== */
+.input-group-text {
+  font-size: 13px;
+  border-radius: 0 8px 8px 0;
+  border-left: 0;
+}
+
+/* =====================================================
+   Meal Items
+===================================================== */
+.meal-item {
+  border: 1px solid #eef1f4;
+  transition: all .25s ease;
+
+  &:hover {
+    border-color: #397A88;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  }
+
+  label {
+    font-size: 12px;
+  }
+
+  .btn.text-danger {
+    transition: all .2s;
+
+    &:hover {
+      transform: scale(1.15);
+    }
+  }
+}
+
+/* =====================================================
+   Summary Card
+===================================================== */
 .summary-card {
-  background: #f8f9fa;
-  border-radius: 18px;
-  padding: 20px;
+  background: linear-gradient(135deg, #ffffff, #f8fbfd);
+  border: 1px solid #e9edf2;
+  border-radius: 16px;
+  transition: all .3s ease;
+
+  hr {
+    border-top: 1px dashed #dfe5ec;
+  }
+
+  .h5, .h6 {
+    color: #2c3e50;
+  }
+
+  .text-primary {
+    color: #397A88 !important;
+  }
 }
 
-.summary-row {
+/* =====================================================
+   Buttons
+===================================================== */
+.btn {
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all .25s ease;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #28a745, #218838);
+  border: none;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(40, 167, 69, 0.3);
+  }
+}
+
+.btn-outline-secondary {
+  border-width: 1.5px;
+
+  &:hover {
+    background: #f1f3f5;
+  }
+}
+
+.btn-outline-primary {
+  border-width: 1.5px;
+
+  &:hover {
+    background: #397A88;
+    color: #fff;
+  }
+}
+
+/* =====================================================
+   Validation
+===================================================== */
+.is-invalid {
+  border-color: #dc3545 !important;
+
+  &:focus {
+    box-shadow: 0 0 0 0.1rem rgba(220, 53, 69, 0.2);
+  }
+}
+
+.invalid-feedback {
+  font-size: 12px;
+}
+
+/* =====================================================
+   Responsive Enhancements
+===================================================== */
+@media (max-width: 768px) {
+  .booking-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+
+    .btn {
+      margin-top: 10px;
+    }
+  }
+
+  .summary-card {
+    font-size: 14px;
+  }
+}
+
+/* =====================================================
+   Smooth Appearance
+===================================================== */
+.booking-card,
+.card.shadow-sm,
+.summary-card {
+  animation: fadeInUp .4s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* =========================================
+   Venue Price Selector – Professional Style
+========================================= */
+
+.venue-price-selector {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  gap: 10px;
 }
 
-.summary-row.final {
-  font-size: 18px;
-  font-weight: 700;
-  color: #397a88;
+.price-box {
+  flex: 1;
+  border: 1px solid #e3e7ed;
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all .25s ease;
+  position: relative;
+  text-align: center;
+  background: #fff;
+
+  input {
+    display: none;
+  }
+
+  .price-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+
+    i {
+      font-size: 18px;
+      margin-bottom: 5px;
+      color: #397A88;
+    }
+  }
+
+  &:hover {
+    border-color: #397A88;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+
+  &.active {
+    border-color: #397A88;
+    background: rgba(57, 122, 136, 0.07);
+
+    .price-content {
+      color: #397A88;
+    }
+  }
+}
+
+/* Custom Price Animation */
+.custom-price-input {
+  animation: fadeIn .3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }

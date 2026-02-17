@@ -2272,7 +2272,6 @@ export class BookingsComponent implements OnInit {
   `;
   }
   // 6. دالة لتوليد محتوى طباعة مبسط (يشبه الصورة تماماً)
- 
 
   // 7. دالة لعرض تنبيه
   showAlert(message: string, type: string = 'info'): void {
@@ -2851,53 +2850,449 @@ export class BookingsComponent implements OnInit {
   @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', 'Segoe UI', sans-serif; }
   body { background: linear-gradient(135deg, #28225c 0%, #faaf3a 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-  @media print { @page { size: A4 portrait; margin: 0mm; } body { background: white !important; padding: 0; min-height: auto; margin: 0; } .receipt-container { box-shadow: none !important; margin: 0 !important; width: 210mm !important; min-height: 297mm !important; border-radius: 0 !important; } .no-print, .print-btn { display: none !important; } }
-  .receipt-container { width: 210mm; min-height: 297mm; background: white; border-radius: 8px; overflow: hidden; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3); margin: 0 auto; }
-  .header { background: linear-gradient(135deg, #28225c 0%, #1a1740 100%); color: white; padding: 15px 20px; position: relative; overflow: hidden; min-height: 110px; }
-  .header::before { content: ''; position: absolute; top: -30px; right: -20px; width: 100px; height: 100px; background: linear-gradient(135deg, #faaf3a 0%, rgba(250,175,58,0.2) 100%); border-radius: 50%; opacity: 0.3; }
-  .restaurant-name { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 3px; position: relative; z-index: 2; color: #faaf3a; text-align: center; }
-  .receipt-title { font-size: 16px; color: rgba(255,255,255,0.9); margin-bottom: 8px; font-weight: 400; position: relative; z-index: 2; text-align: center; }
-  .booking-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding: 10px 15px; background: rgba(250,175,58,0.15); border-radius: 8px; font-size: 13px; border: 1px solid rgba(250,175,58,0.3); position: relative; z-index: 2; }
-  .booking-id { background: #faaf3a; color: #28225c; padding: 5px 15px; border-radius: 15px; font-weight: 700; font-size: 14px; box-shadow: 0 3px 8px rgba(250,175,58,0.4); }
-  .booking-date { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.9); font-size: 13px; }
-  .content { padding: 15px 20px; }
-  .section { margin-bottom: 15px; padding: 15px; border: 1px solid #e8eaf6; border-radius: 8px; background: white; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-  .section-title { font-size: 15px; color: #28225c; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #e8eaf6; font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 14px; }
-  .section-title::before { content: ''; width: 4px; height: 18px; background: linear-gradient(135deg, #28225c, #faaf3a); border-radius: 2px; }
-  .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 15px; }
-  .info-row { display: flex; justify-content: space-between; align-items: center; min-height: 24px; padding: 4px 0; position: relative; }
-  .info-row::after { content: ''; position: absolute; bottom: 0; right: 0; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, #f0f0f0, transparent); }
-  .info-label { color: #666; font-weight: 500; font-size: 12.5px; }
-  .info-value { color: #28225c; font-weight: 600; font-size: 13px; text-align: left; }
-  .meals-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
-  .meals-table thead { background: linear-gradient(135deg, #28225c 0%, #1a1740 100%); }
-  .meals-table th { color: white; padding: 10px 6px; text-align: center; font-weight: 500; font-size: 12.5px; border: 1px solid rgba(255,255,255,0.1); }
-  .meals-table td { padding: 10px 6px; border: 1px solid #f0f0f0; text-align: center; vertical-align: middle; font-size: 12px; }
-  .meals-table tbody tr:nth-child(even) { background: #fafafa; }
-  .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 15px; margin-top: 5px; }
-  .payment-row { display: flex; justify-content: space-between; align-items: center; min-height: 26px; padding: 6px 10px; border-radius: 6px; background: #f9f9f9; border: 1px solid #e8e8e8; font-size: 13px; }
-  .payment-label { color: #555; font-weight: 500; font-size: 12.5px; }
-  .payment-value { color: #28225c; font-weight: 700; font-size: 13px; }
-  .payment-total { background: linear-gradient(135deg, #28225c 0%, #1a1740 100%); border: none; color: white; grid-column: span 2; margin-top: 5px; padding: 8px 10px; }
-  .payment-total .payment-label, .payment-total .payment-value { color: white; font-size: 13.5px; }
-  .payment-paid { background: #f0f9f0; border-color: #c0e0c0; }
-  .payment-paid .payment-value { color: #2e7d32; }
-  .payment-remaining { background: #fff0f0; border-color: #ffc0c0; }
-  .payment-remaining .payment-value { color: #c62828; }
-  .alert-box { background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); padding: 12px; border-radius: 8px; border-right: 3px solid #faaf3a; margin: 15px 0; font-size: 12px; line-height: 1.5; color: #5d4037; position: relative; }
-  .notes-box { background: #f5f5ff; padding: 12px; border-radius: 8px; margin-top: 6px; font-size: 12.5px; line-height: 1.5; color: #28225c; border: 1px solid #d8d8ff; }
-  .footer { text-align: center; margin-top: 20px; padding-top: 15px; position: relative; color: #666; }
-  .footer::before { content: ''; position: absolute; top: 0; right: 50%; transform: translateX(50%); width: 120px; height: 2px; background: linear-gradient(90deg, #28225c, #faaf3a, #28225c); border-radius: 1px; }
-  .footer p { font-size: 12.5px; margin-bottom: 5px; }
-  .footer strong { color: #28225c; }
-  .footer-info { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 12px 15px; background: #f9f9f9; border-radius: 8px; font-size: 11.5px; color: #666; border: 1px solid #e8e8e8; }
-  .footer-contact { display: flex; align-items: center; gap: 8px; }
-  .footer-contact span { display: flex; align-items: center; gap: 5px; padding: 4px 8px; background: white; border-radius: 12px; border: 1px solid #e8e8e8; }
-  .controls { text-align: center; margin: 20px auto; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e8e8e8; }
-  .print-btn { background: linear-gradient(135deg, #28225c 0%, #1a1740 100%); color: white; border: none; padding: 12px 30px; font-size: 13px; border-radius: 50px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(40,34,92,0.3); display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 auto; }
-  .print-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(40,34,92,0.4); }
-  .print-btn::before { content: '🖨️'; font-size: 14px; }
-  .no-data { text-align: center; padding: 20px; color: #999; font-style: italic; font-size: 12.5px; background: #fafafa; border-radius: 6px; border: 1px dashed #e0e0e0; }
+  
+  @media print { 
+    @page { size: A4 portrait; margin: 0mm; } 
+    body { background: white !important; padding: 0; min-height: auto; margin: 0; } 
+    .receipt-container { box-shadow: none !important; margin: 0 !important; width: 210mm !important; min-height: 297mm !important; border-radius: 0 !important; display: flex; flex-direction: column; } 
+    .no-print, .print-btn { display: none !important; }
+    .content { flex: 1 0 auto; }
+    .footer-container { flex-shrink: 0; margin-top: auto; }
+  }
+  
+  .receipt-container { 
+    width: 210mm; 
+    min-height: 297mm; 
+    background: white; 
+    border-radius: 8px; 
+    overflow: hidden; 
+    position: relative; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3); 
+    margin: 0 auto; 
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .header { 
+    background: linear-gradient(135deg, #28225c 0%, #1a1740 100%); 
+    color: white; 
+    padding: 12px 18px; 
+    position: relative; 
+    overflow: hidden; 
+    min-height: 95px; 
+    flex-shrink: 0;
+  }
+  
+  .header::before { 
+    content: ''; 
+    position: absolute; 
+    top: -30px; 
+    right: -20px; 
+    width: 100px; 
+    height: 100px; 
+    background: linear-gradient(135deg, #faaf3a 0%, rgba(250,175,58,0.2) 100%); 
+    border-radius: 50%; 
+    opacity: 0.3; 
+  }
+  
+  .restaurant-name { 
+    font-size: 24px; 
+    font-weight: 800; 
+    letter-spacing: -0.5px; 
+    margin-bottom: 2px; 
+    position: relative; 
+    z-index: 2; 
+    color: #faaf3a; 
+    text-align: center; 
+  }
+  
+  .receipt-title { 
+    font-size: 15px; 
+    color: rgba(255,255,255,0.9); 
+    margin-bottom: 6px; 
+    font-weight: 400; 
+    position: relative; 
+    z-index: 2; 
+    text-align: center; 
+  }
+  
+  .booking-meta { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-top: 8px; 
+    padding: 8px 12px; 
+    background: rgba(250,175,58,0.15); 
+    border-radius: 8px; 
+    font-size: 12px; 
+    border: 1px solid rgba(250,175,58,0.3); 
+    position: relative; 
+    z-index: 2; 
+  }
+  
+  .booking-id { 
+    background: #faaf3a; 
+    color: #28225c; 
+    padding: 4px 12px; 
+    border-radius: 15px; 
+    font-weight: 700; 
+    font-size: 13px; 
+    box-shadow: 0 3px 8px rgba(250,175,58,0.4); 
+  }
+  
+  .booking-date { 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+    color: rgba(255,255,255,0.9); 
+    font-size: 12px; 
+  }
+  
+  .content { 
+    padding: 12px 18px; 
+    flex: 1 0 auto;
+  }
+  
+  .section { 
+    margin-bottom: 12px; 
+    padding: 12px 14px; 
+    border: 1px solid #e8eaf6; 
+    border-radius: 6px; 
+    background: white; 
+    position: relative; 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02); 
+  }
+  
+  .section-title { 
+    font-size: 14px; 
+    color: #28225c; 
+    margin-bottom: 10px; 
+    padding-bottom: 5px; 
+    border-bottom: 1px solid #e8eaf6; 
+    font-weight: 700; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+  }
+  
+  .section-title::before { 
+    content: ''; 
+    width: 4px; 
+    height: 16px; 
+    background: linear-gradient(135deg, #28225c, #faaf3a); 
+    border-radius: 2px; 
+  }
+  
+  .info-grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 6px 12px; 
+  }
+  
+  .info-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: baseline; 
+    min-height: 20px; 
+    padding: 2px 0; 
+    position: relative; 
+  }
+  
+  .info-row::after { 
+    content: ''; 
+    position: absolute; 
+    bottom: 0; 
+    right: 0; 
+    width: 100%; 
+    height: 1px; 
+    background: linear-gradient(90deg, transparent, #f0f0f0, transparent); 
+  }
+  
+  /* ✅ تقريب الداتا من اسم الفيلد */
+  .info-label { 
+    color: #666; 
+    font-weight: 500; 
+    font-size: 12px; 
+    white-space: nowrap;
+    margin-left: 2px; /* تقليل المسافة */
+  }
+  
+  .info-value { 
+    color: #28225c; 
+    font-weight: 600; 
+    font-size: 12.5px; 
+    text-align: left; 
+    margin-right: 0; /* إزالة المسافة الزائدة */
+    padding-right: 0;
+    flex: 1; /* يسمح للقيمة بأخذ المساحة المتبقية */
+  }
+  
+  .meals-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 5px; 
+    font-size: 11.5px; 
+  }
+  
+  .meals-table thead { 
+    background: linear-gradient(135deg, #28225c 0%, #1a1740 100%); 
+  }
+  
+  .meals-table th { 
+    color: white; 
+    padding: 8px 4px; 
+    text-align: center; 
+    font-weight: 500; 
+    font-size: 11.5px; 
+    border: 1px solid rgba(255,255,255,0.1); 
+  }
+  
+  .meals-table td { 
+    padding: 8px 4px; 
+    border: 1px solid #f0f0f0; 
+    text-align: center; 
+    vertical-align: middle; 
+    font-size: 11.5px; 
+  }
+  
+  .meals-table tbody tr:nth-child(even) { 
+    background: #fafafa; 
+  }
+  
+  .payment-grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 6px 10px; 
+    margin-top: 3px; 
+  }
+  
+  .payment-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    min-height: 24px; 
+    padding: 5px 8px; 
+    border-radius: 5px; 
+    background: #f9f9f9; 
+    border: 1px solid #e8e8e8; 
+    font-size: 12px; 
+  }
+  
+  .payment-label { 
+    color: #555; 
+    font-weight: 500; 
+    font-size: 12px; 
+  }
+  
+  .payment-value { 
+    color: #28225c; 
+    font-weight: 700; 
+    font-size: 12.5px; 
+  }
+  
+  .payment-total { 
+    background: linear-gradient(135deg, #28225c 0%, #1a1740 100%); 
+    border: none; 
+    color: white; 
+    grid-column: span 2; 
+    margin-top: 3px; 
+    padding: 7px 8px; 
+  }
+  
+  .payment-total .payment-label, 
+  .payment-total .payment-value { 
+    color: white; 
+    font-size: 13px; 
+  }
+  
+  .payment-paid { 
+    background: #f0f9f0; 
+    border-color: #c0e0c0; 
+  }
+  
+  .payment-paid .payment-value { 
+    color: #2e7d32; 
+  }
+  
+  .payment-remaining { 
+    background: #fff0f0; 
+    border-color: #ffc0c0; 
+  }
+  
+  .payment-remaining .payment-value { 
+    color: #c62828; 
+  }
+  
+  .alert-box { 
+    background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); 
+    padding: 10px; 
+    border-radius: 6px; 
+    border-right: 3px solid #faaf3a; 
+    margin: 10px 0; 
+    font-size: 11.5px; 
+    line-height: 1.4; 
+    color: #5d4037; 
+    position: relative; 
+  }
+  
+  .notes-box { 
+    background: #f5f5ff; 
+    padding: 10px; 
+    border-radius: 6px; 
+    margin-top: 5px; 
+    font-size: 12px; 
+    line-height: 1.5; 
+    color: #28225c; 
+    border: 1px solid #d8d8ff; 
+  }
+  
+  .footer-container {
+    flex-shrink: 0;
+    margin-top: auto;
+    background: white;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  .footer { 
+    text-align: center; 
+    padding: 12px 18px 8px; 
+    position: relative; 
+    color: #666; 
+  }
+  
+  .footer::before { 
+    content: ''; 
+    position: absolute; 
+    top: 0; 
+    right: 50%; 
+    transform: translateX(50%); 
+    width: 100px; 
+    height: 2px; 
+    background: linear-gradient(90deg, #28225c, #faaf3a, #28225c); 
+    border-radius: 1px; 
+  }
+  
+  .footer p { 
+    font-size: 11.5px; 
+    margin-bottom: 4px; 
+  }
+  
+  .footer strong { 
+    color: #28225c; 
+  }
+  
+  .footer-info { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    margin-top: 6px; 
+    padding: 8px 12px; 
+    background: #f9f9f9; 
+    border-radius: 6px; 
+    font-size: 11px; 
+    color: #666; 
+    border: 1px solid #e8e8e8; 
+  }
+  
+  .footer-contact { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+  }
+  
+  .footer-contact span { 
+    display: flex; 
+    align-items: center; 
+    gap: 4px; 
+    padding: 3px 6px; 
+    background: white; 
+    border-radius: 12px; 
+    border: 1px solid #e8e8e8; 
+    font-size: 11px; 
+  }
+  
+  .controls { 
+    text-align: center; 
+    margin: 15px auto; 
+    padding: 12px; 
+    background: #f9f9f9; 
+    border-radius: 6px; 
+    border: 1px solid #e8e8e8; 
+  }
+  
+  .print-btn { 
+    background: linear-gradient(135deg, #28225c 0%, #1a1740 100%); 
+    color: white; 
+    border: none; 
+    padding: 10px 25px; 
+    font-size: 12px; 
+    border-radius: 40px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    transition: all 0.3s ease; 
+    box-shadow: 0 4px 12px rgba(40,34,92,0.3); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 6px; 
+    margin: 0 auto; 
+  }
+  
+  .print-btn:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 18px rgba(40,34,92,0.4); 
+  }
+  
+  .print-btn::before { 
+    content: '🖨️'; 
+    font-size: 13px; 
+  }
+  
+  .no-data { 
+    text-align: center; 
+    padding: 15px; 
+    color: #999; 
+    font-style: italic; 
+    font-size: 11.5px; 
+    background: #fafafa; 
+    border-radius: 4px; 
+    border: 1px dashed #e0e0e0; 
+  }
+
+  .created-by { 
+    margin-bottom: 4px; 
+    padding: 6px; 
+    background: #f8f9fa; 
+    border-radius: 4px; 
+    border: 1px solid #e8e8e8; 
+    display: inline-block; 
+    font-size: 12px;
+  }
+  
+  /* ✅ تحسين تقارب الداتا من الـ label */
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 5px; /* بدل المسافات الكبيرة */
+  }
+  
+  .info-label {
+    flex-shrink: 0; /* منع الـ label من التقلص */
+  }
+  
+  .info-value {
+    flex-grow: 1; /* أخذ المساحة المتبقية */
+    text-align: left;
+    font-weight: 700;
+  }
+  
+  /* ✅ للهواتف */
+  @media (max-width: 768px) {
+    .info-label { font-size: 11px; }
+    .info-value { font-size: 11.5px; }
+  }
 </style>
 </head>
 <body>
@@ -2967,18 +3362,20 @@ export class BookingsComponent implements OnInit {
     </div>
 
    ${notesSection}
+   <div class="footer" style="text-align: center; color: #28225c; font-size: 12px; margin-top: 15px; line-height: 1.4;">
+  <div style="margin-bottom: 4px;">
+    <span>القائم بالحجـز: </span>
+    <span style="font-weight: 600;">${booking.createdByUserName || '---'}</span>
+  </div>
 
-    <div class="footer">
-      <p>© devpioneerجميع الحقوق محفوظة</p>
-      <div class="footer-info">
-        <div class="footer-contact">
-          <span>📞 01008670818</span>
-        </div>
-        <div class="footer-contact">
-          <span>🖥 www.fleetclub.com</span>
-        </div>
-      </div>
+  <p style="margin: 4px 0; font-size: 11px;">© جميع الحقوق محفوظة - devpioneer</p>
+
+  <div class="footer-info" style="margin-top: 4px;">
+    <div class="footer-contact" style="display: flex; justify-content: center; gap: 8px; font-size: 11px;">
+      <span>📞 01092209699</span>
     </div>
+  </div>
+</div>
 
     <div class="controls no-print">
       <button class="print-btn" onclick="window.print()">طباعة الفاتورة</button>

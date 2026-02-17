@@ -1,247 +1,290 @@
 <div class="booking-container container-fluid mt-4" dir="rtl">
   <div class="card shadow-lg border-0 booking-card">
-    <div class="card-header bg-primary text-white d-flex align-items-center">
-      <i class="fa fa-edit mr-2 fa-lg"></i>
-      <h5 class="mb-0">تعديل الحجز</h5>
-    </div>
+    <!-- ================= HEADER ================= -->
+<div class="card-header edit-header text-white d-flex justify-content-between align-items-center">
+  
+  <div class="d-flex align-items-center">
+    <button class="btn btn-light btn-sm ml-3 back-btn"
+            routerLink="/bookings">
+      <i class="fa fa-arrow-right ml-1"></i>
+      عودة للحجوزات
+    </button>
 
+    <div>
+      <i class="fa fa-pencil ml-2"></i>
+      <span class="font-weight-bold">تعديل الحجز</span>
+    </div>
+  </div>
+
+  <span class="badge badge-light">
+    رقم الحجز #{{ bookingId }}
+  </span>
+</div>
     <div class="card-body">
       <form [formGroup]="bookingForm" (ngSubmit)="submitBooking()">
-        <!-- Client Info -->
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label>اسم العميل</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="clientName"
-            />
-          </div>
-          <div class="form-group col-md-6">
-            <label>رقم الهاتف</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="clientPhone"
-            />
-          </div>
-        </div>
 
-        <!-- Venue -->
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label>المكان</label>
-            <select
-              class="form-control"
-              formControlName="venueId"
-              (change)="onVenueChange()"
-            >
-              <option [value]="null">اختر المكان</option>
-              <option *ngFor="let v of venues" [value]="v.venueId">
-                {{ v.venueName }}
-              </option>
-            </select>
-          </div>
+        <!-- ================= Client Info ================= -->
+        <div class="card form-section mb-4">
+          <div class="card-body">
+            <h6 class="section-title">
+              <i class="fa fa-user ml-2"></i>
+              معلومات العميل
+            </h6>
 
-          <div class="form-group col-md-6">
-            <label>سعر المكان</label>
-            <div class="d-flex align-items-center">
-              <div class="form-check mr-2">
-                <input
-                  type="radio"
-                  class="form-check-input"
-                  name="venuePriceOption"
-                  value="0"
-                  (change)="onVenuePriceOptionChange($event)"
-                  [checked]="!isCustomPrice"
-                />
-                <label class="form-check-label">مجاني</label>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label>اسم العميل</label>
+                <input type="text" class="form-control" formControlName="clientName">
               </div>
-              <div class="form-check">
-                <input
-                  type="radio"
-                  class="form-check-input"
-                  name="venuePriceOption"
-                  value="1"
-                  (change)="onVenuePriceOptionChange($event)"
-                  [checked]="isCustomPrice"
-                />
-                <label class="form-check-label">سعر خاص</label>
+
+              <div class="form-group col-md-6">
+                <label>رقم الهاتف</label>
+                <input type="text" class="form-control" formControlName="clientPhone">
               </div>
             </div>
-            <input
-              *ngIf="isCustomPrice"
-              type="number"
-              class="form-control mt-1"
-              formControlName="venueExtraPrice"
-            />
           </div>
         </div>
 
-        <!-- Booking Type / Date / Time -->
-        <div class="form-row">
-          <div class="form-group col-md-4">
-            <label>نوع الحجز</label>
-            <select class="form-control" formControlName="bookingType">
-              <option *ngFor="let t of bookingTypes" [value]="t.id">
-                {{ t.name }}
-              </option>
-            </select>
-          </div>
-          <div class="form-group col-md-4">
-            <label>التاريخ</label>
-            <input
-              type="date"
-              class="form-control"
-              formControlName="bookingDate"
-            />
-          </div>
-          <div class="form-group col-md-4">
-            <label>الوقت</label>
-            <input
-              type="time"
-              class="form-control"
-              formControlName="bookingTime"
-            />
-          </div>
-        </div>
+        <!-- ================= Venue & Booking Info ================= -->
+        <div class="card form-section mb-4">
+          <div class="card-body">
+            <h6 class="section-title">
+              <i class="fa fa-map-marker ml-2"></i>
+              تفاصيل الحجز
+            </h6>
 
-        <!-- Number of People -->
-        <div class="form-group">
-          <label>عدد الأشخاص</label>
-          <input
-            type="number"
-            class="form-control"
-            formControlName="numberOfPeople"
-            min="1"
-          />
-        </div>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label>المكان</label>
+                <select class="form-control"
+                        formControlName="venueId"
+                        (change)="onVenueChange()">
+                  <option [value]="null">اختر المكان</option>
+                  <option *ngFor="let v of venues" [value]="v.venueId">
+                    {{ v.venueName }}
+                  </option>
+                </select>
+              </div>
 
-        <!-- Payment -->
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label>طريقة الدفع</label>
-            <select class="form-control" formControlName="paymentMethod">
-              <option [value]="null">اختر طريقة الدفع</option>
-              <option *ngFor="let p of paymentMethods" [value]="p.id">
-                {{ p.name }}
-              </option>
-            </select>
-          </div>
-          <div class="form-group col-md-6">
-            <label>رقم الإيصال</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="receiptNumber"
-            />
-          </div>
-        </div>
+              <div class="form-group col-md-4">
+                <label>نوع الحجز</label>
+                <select class="form-control" formControlName="bookingType">
+                  <option *ngFor="let t of bookingTypes" [value]="t.id">
+                    {{ t.name }}
+                  </option>
+                </select>
+              </div>
 
-        <!-- Deposit & Note -->
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label>المقدم</label>
-            <input
-              type="number"
-              class="form-control"
-              formControlName="depositAmount"
-              min="0"
-            />
-          </div>
-          <div class="form-group col-md-6">
-            <label>ملاحظات</label>
-            <input type="text" class="form-control" formControlName="note" />
-          </div>
-        </div>
+              <div class="form-group col-md-4">
+                <label>عدد الأشخاص</label>
+                <input type="number" class="form-control"
+                       formControlName="numberOfPeople" min="1">
+              </div>
+            </div>
 
-        <!-- Meals -->
-        <div class="mt-4" *ngIf="meals && mealsList && mealsList.length">
-          <h5>الوجبات</h5>
-          <div formArrayName="meals">
-            <div
-              *ngFor="let meal of meals.controls; let i = index"
-              [formGroupName]="i"
-              class="border p-2 mb-2 rounded"
-            >
-              <div class="form-row align-items-center">
-                <div class="form-group col-md-4">
-                  <label>الوجبة</label>
-                  <select
-                    class="form-control"
-                    formControlName="MealId"
-                    (change)="onMealChange(i)"
-                  >
-                    <option *ngFor="let m of mealsList" [value]="m.mealId">
-                      {{ m.mealName }}
-                    </option>
-                  </select>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label>التاريخ</label>
+                <input type="date" class="form-control"
+                       formControlName="bookingDate">
+              </div>
+
+              <div class="form-group col-md-4">
+                <label>الوقت</label>
+                <input type="time" class="form-control"
+                       formControlName="bookingTime">
+              </div>
+
+              <div class="form-group col-md-4">
+                <label>سعر المكان</label>
+
+                <div class="venue-price-selector">
+
+                  <label class="price-box"
+                         [class.active]="!isCustomPrice">
+                    <input type="radio"
+                           name="venuePriceOption"
+                           value="0"
+                           (change)="onVenuePriceOptionChange($event)">
+                    <div class="price-content">
+                      <i class="fa fa-gift"></i>
+                      مجاني
+                    </div>
+                  </label>
+
+                  <label class="price-box"
+                         [class.active]="isCustomPrice">
+                    <input type="radio"
+                           name="venuePriceOption"
+                           value="1"
+                           (change)="onVenuePriceOptionChange($event)">
+                    <div class="price-content">
+                      <i class="fa fa-tag"></i>
+                      سعر خاص
+                    </div>
+                  </label>
+
                 </div>
-                <div class="form-group col-md-3">
-                  <label>الكمية</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    formControlName="Quantity"
-                    min="1"
-                  />
+
+                <div *ngIf="isCustomPrice" class="mt-2">
+                  <input type="number"
+                         class="form-control"
+                         formControlName="venueExtraPrice"
+                         placeholder="ادخل السعر الخاص">
                 </div>
-                <div class="form-group col-md-3">
-                  <label>السعر للوحدة</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    formControlName="UnitPrice"
-                    min="0"
-                  />
-                </div>
-                <div class="form-group col-md-2 text-center">
-                  <label>إجمالي</label>
-                  <div class="form-control text-center">
-                    {{ getMealTotal(i) | number: "1.0-2" }}
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= Payment ================= -->
+        <div class="card form-section mb-4">
+          <div class="card-body">
+            <h6 class="section-title">
+              <i class="fa fa-credit-card ml-2"></i>
+              بيانات الدفع
+            </h6>
+
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label>طريقة الدفع</label>
+                <select class="form-control" formControlName="paymentMethod">
+                  <option [value]="null">اختر طريقة الدفع</option>
+                  <option *ngFor="let p of paymentMethods" [value]="p.id">
+                    {{ p.name }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group col-md-4">
+                <label>رقم الإيصال</label>
+                <input type="text" class="form-control"
+                       formControlName="receiptNumber">
+              </div>
+
+              <div class="form-group col-md-4">
+                <label>المقدم</label>
+                <input type="number" class="form-control"
+                       formControlName="depositAmount" min="0">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>ملاحظات</label>
+              <textarea class="form-control"
+                        formControlName="note"
+                        rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= Meals ================= -->
+        <div class="card form-section mb-4"
+             *ngIf="meals && mealsList && mealsList.length">
+
+          <div class="card-body">
+            <h6 class="section-title">
+              <i class="fa fa-cutlery ml-2"></i>
+              الوجبات
+            </h6>
+
+            <div formArrayName="meals">
+              <div *ngFor="let meal of meals.controls; let i = index"
+                   [formGroupName]="i"
+                   class="meal-card card border-0 shadow-sm mb-3">
+
+                <div class="card-body">
+                  <div class="form-row align-items-end">
+
+                    <div class="form-group col-md-4">
+                      <label>الوجبة</label>
+                      <select class="form-control"
+                              formControlName="MealId"
+                              (change)="onMealChange(i)">
+                        <option *ngFor="let m of mealsList"
+                                [value]="m.mealId">
+                          {{ m.mealName }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-md-3">
+                      <label>الكمية</label>
+                      <input type="number"
+                             class="form-control"
+                             formControlName="Quantity"
+                             min="1">
+                    </div>
+
+                    <div class="form-group col-md-3">
+                      <label>السعر</label>
+                      <input type="number"
+                             class="form-control"
+                             formControlName="UnitPrice"
+                             min="0">
+                    </div>
+
+                    <div class="form-group col-md-2 text-center">
+                      <label>الإجمالي</label>
+                      <div class="total-box">
+                        {{ getMealTotal(i) | number:'1.0-2' }} ج.م
+                      </div>
+
+                      <button type="button"
+                              class="btn btn-sm btn-outline-danger mt-2"
+                              (click)="removeMeal(i)">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </div>
+
                   </div>
-                  <button
-                    type="button"
-                    class="btn btn-danger btn-sm mt-1"
-                    (click)="removeMeal(i)"
-                  >
-                    حذف
-                  </button>
                 </div>
               </div>
             </div>
+
+            <button type="button"
+                    class="btn btn-outline-primary mt-2"
+                    (click)="addMeal()">
+              <i class="fa fa-plus ml-1"></i>
+              إضافة وجبة
+            </button>
+
+          </div>
+        </div>
+
+        <!-- ================= Summary ================= -->
+        <div class="summary-box mt-4 p-4 rounded">
+          <div class="d-flex justify-content-between mb-2">
+            <span>إجمالي الوجبات</span>
+            <strong>{{ getTotalMealsPrice() | number:'1.0-2' }} ج.م</strong>
           </div>
 
-          <button
-            type="button"
-            class="btn btn-primary mt-2"
-            (click)="addMeal()"
-          >
-            إضافة وجبة
-          </button>
+          <div class="d-flex justify-content-between mb-2">
+            <span>الخدمة</span>
+            <strong>{{ getServiceCharge() | number:'1.0-2' }} ج.م</strong>
+          </div>
+
+          <hr>
+
+          <div class="d-flex justify-content-between final-total">
+            <span>الإجمالي النهائي</span>
+            <strong>{{ getFinalTotal() | number:'1.0-2' }} ج.م</strong>
+          </div>
         </div>
 
-        <!-- Totals -->
-        <div class="mt-3 text-right">
-          <p>
-            إجمالي الوجبات: {{ getTotalMealsPrice() | number: "1.0-2" }} جنيه
-          </p>
-          <p>الضريبة: {{ getServiceCharge() | number: "1.0-2" }} جنيه</p>
-          <h5>
-            الإجمالي النهائي: {{ getFinalTotal() | number: "1.0-2" }} جنيه
-          </h5>
-        </div>
-
-        <!-- Submit -->
-        <div class="mt-4 text-center">
-          <button
-            type="submit"
-            class="btn btn-success"
-            [disabled]="isSubmitting"
-          >
+        <!-- ================= Submit ================= -->
+        <div class="text-center mt-4">
+          <button type="submit"
+                  class="btn btn-save px-5"
+                  [disabled]="isSubmitting">
+            <i class="fa"
+               [ngClass]="{'fa-spinner fa-spin': isSubmitting, 'fa-save': !isSubmitting}">
+            </i>
             حفظ التعديل
           </button>
         </div>
+
       </form>
     </div>
   </div>

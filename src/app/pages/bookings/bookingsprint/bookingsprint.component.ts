@@ -5,6 +5,7 @@ import { Booking, BookingService, BookingStatus, BookingType } from 'src/app/ser
 import { Meal, MealService } from 'src/app/services/meal.service';
 import { VenueService } from 'src/app/services/venue.service';
 import { environment } from 'src/environments/environment';
+import { ReportprintService } from '../../../services/reportprint.service';
 
 @Component({
   selector: 'app-bookingsprint',
@@ -23,6 +24,8 @@ filterType: number | 'all' = 'all';       // 5 , 6
 filterStatus: number | 'all' = 'all';     // 0 , 1 , 2 , 3
 filterVenue: number | 'all' = 'all';
 filterDate: string = '';
+filterDateFrom: string | null = null;
+filterDateTo: string | null = null;
   
   // ==================== REPORT INFO ====================
   reportDate = new Date().toISOString().split('T')[0];
@@ -54,6 +57,7 @@ printTemplates = [
     private venueService: VenueService,
     private route: ActivatedRoute,
     private router: Router,
+    private ReportprintService:ReportprintService,
     private toastr: ToastrService
   ) {}
 
@@ -584,47 +588,95 @@ generateCustomerReceipt(booking: any): string {
   `;
 }
 
+resetFilters(): void {
 
+  this.filterDate = null;
+  this.filterDateFrom = null;
+  this.filterDateTo = null;
+
+  this.filterType = 'all';
+  this.filterStatus = 'all';
+  this.filterVenue = 'all';
+
+  this.filteredBookings = [...this.bookings];
+
+  this.updateReportTitle();
+  this.calculateStatistics();
+}
 
 getStatusText(status: number | string): string {
   switch (status) {
     case 0: return 'قيد الانتظار';
     case 1: return 'مؤكد';
-    case 2: return 'ملغي';
-    case 3: return 'مؤجل';
+    case 2: return 'مكتمل';
+    case 3: return 'ملغي';
+    case 4: return 'مؤجل';
     default: return 'غير معروف';
   }
 }
   // ==================== APPLY FILTERS ====================
 applyFilters(): void {
-  let result = [...this.bookings];
 
-  // نوع الحجز
-  if (this.filterType !== 'all') {
-    result = result.filter(b => b.bookingType === this.filterType);
-  }
+  this.filteredBookings = this.bookings.filter(b => {
 
-  // المكان
-  if (this.filterVenue !== 'all') {
-    result = result.filter(b => b.venueId === this.filterVenue);
-  }
+    let matchesDate = true;
+    let matchesType = true;
+    let matchesStatus = true;
+    let matchesVenue = true;
 
-  // الحالة ✅
-  if (this.filterStatus !== 'all') {
-    result = result.filter(b => b.bookingStatus === this.filterStatus);
-  }
+    // ======== تجهيز تاريخ الحجز ========
+    const bookingDate = new Date(b.bookingDate);
+    bookingDate.setHours(0, 0, 0, 0);
 
-  // التاريخ
-  if (this.filterDate) {
-    result = result.filter(b => {
-      const datePart = b.bookingDate?.split('T')[0];
-      return datePart === this.filterDate;
-    });
-  }
+    // ======== فلترة التاريخ ========
 
-  this.filteredBookings = result;
+    // لو مختار تاريخ محدد
+    if (this.filterDate) {
+
+      const selected = new Date(this.filterDate);
+      selected.setHours(0, 0, 0, 0);
+
+      matchesDate = bookingDate.getTime() === selected.getTime();
+    }
+
+    // لو مختار فترة
+    else if (this.filterDateFrom || this.filterDateTo) {
+
+      if (this.filterDateFrom) {
+        const from = new Date(this.filterDateFrom);
+        from.setHours(0, 0, 0, 0);
+        if (bookingDate < from) matchesDate = false;
+      }
+
+      if (this.filterDateTo) {
+        const to = new Date(this.filterDateTo);
+        to.setHours(23, 59, 59, 999);
+        if (bookingDate > to) matchesDate = false;
+      }
+    }
+
+    // ======== النوع ========
+    if (this.filterType !== 'all') {
+      matchesType = b.bookingType === Number(this.filterType);
+    }
+
+    // ======== الحالة ========
+    if (this.filterStatus !== 'all') {
+      matchesStatus = b.bookingStatus === Number(this.filterStatus);
+    }
+
+    // ======== المكان ========
+    if (this.filterVenue !== 'all') {
+      matchesVenue = b.venueId === Number(this.filterVenue);
+    }
+
+    return matchesDate && matchesType && matchesStatus && matchesVenue;
+  });
+
+  this.updateReportTitle();
   this.calculateStatistics();
 }
+
 
   // ==================== CALCULATE STATISTICS ====================
   calculateStatistics(): void {
@@ -652,14 +704,59 @@ printReport(): void {
 }
 
 
+// printPaymentsOnly(date: Date): void {
+//   const dayBookings = this.bookings.filter(booking => {
+//     const bookingDate = new Date(booking.bookingDate);
+//     return (
+//       bookingDate.getDate() === date.getDate() &&
+//       bookingDate.getMonth() === date.getMonth() &&
+//       bookingDate.getFullYear() === date.getFullYear()
+//     );
+//   });
+
+//   if (dayBookings.length === 0) {
+//     this.toastr.warning('لا توجد حجوزات في هذا اليوم');
+//     return;
+//   }
+
+//   const title = `مدفوعات يوم ${date.toLocaleDateString('ar-EG')}`;
+//   const printContent = this.ReportprintService.generatePaymentOnlyContent(
+//     dayBookings,
+//     title,
+//     (venueId) => this.getVenueName(venueId)
+//   );
+  
+//   this.ReportprintService.openPrintWindow(printContent);
+// }
+printPaymentOnlyReport(): void {
+  const bookingsToPrint = this.filteredBookings.length > 0 
+    ? this.filteredBookings 
+    : this.bookings;
+
+  if (bookingsToPrint.length === 0) {
+    this.toastr.warning('لا توجد حجوزات للطباعة');
+    return;
+  }
+
+  const title = 'تقرير المدفوعات';
+  const printContent = this.ReportprintService.generatePaymentOnlyContent(
+    bookingsToPrint,
+    title,
+    (venueId) => this.getVenueName(venueId),
+    (type) => this.getBookingTypeText(type) // ✅ تمرير دالة جلب نوع الحجز
+  );
+  
+  this.ReportprintService.openPrintWindow(printContent);
+  this.toastr.success('جاري طباعة تقرير المدفوعات');
+}
   // ==================== GENERATE PRINT CONTENT ====================
 
   /**
    * 1️⃣ طباعة محطة التوزيع - للموظفين
    */
- generateStationContent(bookings: any[], title: string): string {
+generateStationContent(bookings: any[], title: string): string {
 
-   const TAX_RATE = environment.TAX_RATE; // ✅ نسبة الضريبة
+  const TAX_RATE = environment.TAX_RATE; // ✅ نسبة الضريبة
   const sortedBookings = [...bookings].sort((a, b) => {
     return new Date(a.bookingDate).getTime() - new Date(b.bookingDate).getTime();
   });
@@ -675,12 +772,13 @@ printReport(): void {
 
     // ================= الحسابات =================
     let mealsTotal = 0;
+    let venuePrice = 0;
     let taxAmount = 0;
     let totalWithTax = 0;
     let mealsTable = '';
 
+    // حساب إجمالي الوجبات
     if (booking.meals && booking.meals.length > 0) {
-
       mealsTotal = booking.meals.reduce((sum: number, meal: any) => {
         return sum + ((meal.quantity || 0) * (meal.unitPrice || 0));
       }, 0);
@@ -695,14 +793,19 @@ printReport(): void {
         `;
       });
       mealsTable += '</table>';
-
     } else {
       mealsTable = '<span class="no-meals">لا توجد وجبات</span>';
       mealsTotal = booking.totalAmount || 0;
     }
 
+    // سعر القاعة إذا وجد
+    venuePrice = booking.venuePrice || 0;
+    
+    // حساب الضريبة (على الوجبات فقط)
     taxAmount = mealsTotal * TAX_RATE;
-    totalWithTax = mealsTotal + taxAmount;
+    
+    // الإجمالي شامل الضريبة + سعر القاعة
+    totalWithTax = mealsTotal + taxAmount + venuePrice;
 
     const paid = booking.depositAmount || booking.paidAmount || 0;
     const remaining = totalWithTax - paid;
@@ -745,16 +848,25 @@ printReport(): void {
             </div>
           </div>
 
-          <!-- المدفوعات -->
+          ${venuePrice > 0 ? `
+          <div class="info-row">
+            <div class="info-field">
+              <span class="field-name">سعر القاعة:</span>
+              <span class="field-value" style="color: #8e44ad; font-weight: bold;">${venuePrice.toLocaleString('ar-EG')} ج.م</span>
+            </div>
+          </div>
+          ` : ''}
+
+          <!-- المدفوعات - بدون عرض الضريبة -->
           <div class="payment-row">
-            <div class="payment-item">
-              <span class="payment-label">الإجمالي:</span>
+            <div class="payment-item total-item">
+              <span class="payment-label">إجمالي الوجبات:</span>
               <span class="payment-value">${mealsTotal.toLocaleString('ar-EG')} ج.م</span>
             </div>
 
             <div class="payment-item">
-              <span class="payment-label">الضريبة (12%):</span>
-              <span class="payment-value">${taxAmount.toLocaleString('ar-EG')} ج.م</span>
+              <span class="payment-label">الإجمالي النهائي:</span>
+              <span class="payment-value grand-total">${totalWithTax.toLocaleString('ar-EG')} ج.م</span>
             </div>
 
             <div class="payment-item">
@@ -950,18 +1062,26 @@ printReport(): void {
             font-size: 10px;
           }
           
-          /* قسم المدفوعات مضغوط */
+          /* قسم المدفوعات */
           .payment-row {
             display: flex;
             justify-content: space-between;
             margin-top: 4px;
             padding: 4px 0;
             border-top: 1px solid #eee;
+            gap: 8px;
           }
           
           .payment-item {
             text-align: center;
             flex: 1;
+            padding: 4px;
+            border-radius: 3px;
+          }
+          
+          .total-item {
+            background-color: #e8f4f8;
+            border: 1px solid #b8d9e6;
           }
           
           .payment-label {
@@ -976,6 +1096,11 @@ printReport(): void {
             color: #2c3e50;
             font-weight: bold;
             font-size: 11px;
+          }
+          
+          .payment-value.grand-total {
+            color: #2980b9;
+            font-size: 12px;
           }
           
           .payment-value.paid {
@@ -1257,9 +1382,6 @@ ${boatKitchenContent}
 `;
 }
 
-
-
-
   /**
    * 3️⃣ طباعة الإدارة - للمالية
    */
@@ -1268,8 +1390,8 @@ generateFinancialContent(bookings: any[], title: string): string {
   const currentDate = new Date().toLocaleDateString('ar-EG');
 
   const activeBookings = bookings.filter(b => b.bookingStatus === 1);
-  const cancelledBookings = bookings.filter(b => b.bookingStatus === 2);
-  const postponedBookings = bookings.filter(b => b.bookingStatus === 3);
+  const cancelledBookings = bookings.filter(b => b.bookingStatus === 3);
+  const postponedBookings = bookings.filter(b => b.bookingStatus === 4);
 
   const buildRows = (list: any[], icon: string) => {
     if (!list.length) {
@@ -1704,19 +1826,36 @@ printKitchenReport(): void {
   }
 
   updateReportTitle(): void {
-    let title = 'تقرير ';
-    
-    if (this.filterType !== 'all') {
-      title += this.getBookingTypeTextFromString(this.filterType) + ' ';
-    }
-    
-    if (this.filterDate) {
-      const dateObj = new Date(this.filterDate);
-      title += `بتاريخ ${dateObj.toLocaleDateString('ar-EG')} `;
-    }
-    
-    this.reportTitle = title.trim();
+
+  let parts: string[] = [];
+
+  // نوع الحجز
+  if (this.filterType !== 'all') {
+    parts.push(this.getBookingTypeTextFromString(this.filterType));
   }
+
+  // التاريخ المحدد
+  if (this.filterDate) {
+    parts.push(`ليوم ${this.filterDate}`);
+  }
+
+  // الفترة الزمنية
+  else if (this.filterDateFrom && this.filterDateTo) {
+    parts.push(`من ${this.filterDateFrom} إلى ${this.filterDateTo}`);
+  }
+  else if (this.filterDateFrom) {
+    parts.push(`من ${this.filterDateFrom}`);
+  }
+  else if (this.filterDateTo) {
+    parts.push(`حتى ${this.filterDateTo}`);
+  }
+
+  if (parts.length > 0) {
+    this.reportTitle = 'تقرير ' + parts.join(' ');
+  } else {
+    this.reportTitle = 'تقرير جميع الحجوزات';
+  }
+}
 
   getVenueName(venueId?: number): string {
     if (!venueId) return 'غير محدد';
@@ -1793,7 +1932,6 @@ parseRouteParams(): void {
   });
 }
 
-
   loadMeals(): void {
     this.mealService.getAllMeals().subscribe({
       next: (data) => {
@@ -1866,4 +2004,566 @@ getStatusClass(status: BookingStatus): string {
     default: return '';
   }
 }
+
+
+
+// ==================== PRINT VENUES STATISTICS ====================
+printVenuesStatistics(): void {
+  const bookingsToPrint = this.filteredBookings.length > 0 
+    ? this.filteredBookings 
+    : this.bookings;
+
+  if (bookingsToPrint.length === 0) {
+    this.toastr.warning('لا توجد حجوزات للطباعة');
+    return;
+  }
+
+  const title = this.filterDate 
+    ? `إحصائيات الأماكن - ${new Date(this.filterDate).toLocaleDateString('ar-EG')}`
+    : 'إحصائيات الأماكن';
+
+  const content = this.generateVenuesStatisticsContent(bookingsToPrint, title);
+  
+  this.openPrintWindow(content, title);
+  this.toastr.success('جاري طباعة إحصائيات الأماكن');
+}
+
+generateVenuesStatisticsContent(bookings: any[], title: string): string {
+  // تجميع إحصائيات الأماكن
+  const venuesStats = new Map<number, {
+    venueName: string;
+    bookingsCount: number;
+    totalGuests: number;
+    totalRevenue: number;
+    bookings: any[];
+  }>();
+
+  bookings.forEach(booking => {
+    const venueId = booking.venueId;
+    if (venueId) {
+      const venueName = this.getVenueName(venueId);
+      const current = venuesStats.get(venueId) || {
+        venueName,
+        bookingsCount: 0,
+        totalGuests: 0,
+        totalRevenue: 0,
+        bookings: []
+      };
+      
+      current.bookingsCount += 1;
+      current.totalGuests += booking.guestsCount || 0;
+      current.totalRevenue += booking.depositAmount || 0;
+      current.bookings.push(booking);
+      
+      venuesStats.set(venueId, current);
+    }
+  });
+
+  // تحويل الماب إلى مصفوفة وترتيبها
+  const sortedVenues = Array.from(venuesStats.values())
+    .sort((a, b) => b.bookingsCount - a.bookingsCount);
+
+  const currentDate = new Date().toLocaleDateString('ar-EG');
+  const currentTime = new Date().toLocaleTimeString('ar-EG', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  // حساب الإجماليات
+  const totalVenues = sortedVenues.length;
+  const totalBookingsAll = bookings.length;
+  const totalGuestsAll = bookings.reduce((sum, b) => sum + (b.guestsCount || 0), 0);
+  const totalRevenueAll = bookings.reduce((sum, b) => sum + (b.depositAmount || 0), 0);
+
+  // إنشاء بطاقات الأماكن
+  let venuesCards = '';
+  sortedVenues.forEach((venue, index) => {
+    // ترتيب حجوزات المكان
+    const sortedBookings = venue.bookings.sort((a, b) => 
+      new Date(a.bookingTime).getTime() - new Date(b.bookingTime).getTime()
+    );
+
+    // قائمة حجوزات المكان
+    const bookingsList = sortedBookings.map((b, i) => {
+      const time = this.formatTime(b.bookingTime);
+      return `
+        <tr>
+          <td class="text-center">${i + 1}</td>
+          <td>${b.clientName || 'غير محدد'}</td>
+          <td class="text-center">${time}</td>
+          <td class="text-center">${b.guestsCount || 0}</td>
+          <td class="text-center">${this.getStatusText(b.bookingStatus)}</td>
+          <td class="text-center">${(b.depositAmount || 0).toLocaleString('ar-EG')}</td>
+        </tr>
+      `;
+    }).join('');
+
+    // نسبة الإشغال
+    const occupancyPercentage = (venue.bookingsCount / totalBookingsAll) * 100;
+
+    venuesCards += `
+      <div class="venue-section">
+        <div class="venue-header ${index === 0 ? 'top-venue' : ''}">
+          <div class="venue-title">
+            <span class="venue-rank">#${index + 1}</span>
+            <i class="fa fa-map-marker"></i>
+            ${venue.venueName}
+            ${index === 0 ? '<span class="top-badge">🏆 الأكثر حجوزات</span>' : ''}
+          </div>
+          <div class="venue-stats-badges">
+            <span class="stat-badge bookings-badge">
+              <i class="fa fa-calendar-check-o"></i> ${venue.bookingsCount} حجز
+            </span>
+            <span class="stat-badge guests-badge">
+              <i class="fa fa-users"></i> ${venue.totalGuests} شخص
+            </span>
+            <span class="stat-badge revenue-badge">
+              <i class="fa fa-money"></i> ${venue.totalRevenue.toLocaleString('ar-EG')} ج.م
+            </span>
+          </div>
+        </div>
+
+        <div class="venue-summary-stats">
+          <div class="summary-stat">
+            <span class="stat-label">نسبة الإشغال</span>
+            <span class="stat-value">${occupancyPercentage.toFixed(1)}%</span>
+            <div class="progress-bar-container">
+              <div class="progress-bar" style="width: ${occupancyPercentage}%"></div>
+            </div>
+          </div>
+          <div class="summary-stat">
+            <span class="stat-label">متوسط الضيوف</span>
+            <span class="stat-value">${(venue.totalGuests / venue.bookingsCount).toFixed(1)}</span>
+          </div>
+          <div class="summary-stat">
+            <span class="stat-label">متوسط الإيرادات</span>
+            <span class="stat-value">${(venue.totalRevenue / venue.bookingsCount).toFixed(0)} ج.م</span>
+          </div>
+        </div>
+
+        <table class="bookings-table">
+          <thead>
+            <tr>
+              <th width="40">#</th>
+              <th>اسم العميل</th>
+              <th width="80">الوقت</th>
+              <th width="70">الضيوف</th>
+              <th width="90">الحالة</th>
+              <th width="100">المدفوع</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${bookingsList || `
+              <tr>
+                <td colspan="6" class="text-center empty">لا توجد حجوزات</td>
+              </tr>
+            `}
+          </tbody>
+        </table>
+      </div>
+    `;
+  });
+
+  return `
+    <!DOCTYPE html>
+    <html dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>${title}</title>
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+        }
+        
+        body {
+          padding: 15mm;
+          background: #f8f9fa;
+          color: #2c3e50;
+          font-size: 12px;
+          line-height: 1.5;
+        }
+        
+        @media print {
+          @page {
+            size: A4;
+            margin: 10mm;
+          }
+          
+          body {
+            padding: 0;
+            background: white;
+          }
+          
+          .no-print {
+            display: none !important;
+          }
+          
+          .venue-section {
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+        }
+        
+        /* الترويسة */
+        .report-header {
+          text-align: center;
+          margin-bottom: 25px;
+          padding-bottom: 15px;
+          border-bottom: 3px solid #3498db;
+        }
+        
+        .report-header h1 {
+          font-size: 24px;
+          color: #2c3e50;
+          margin-bottom: 10px;
+        }
+        
+        .report-header h1 i {
+          color: #3498db;
+          margin-left: 10px;
+        }
+        
+        .report-meta {
+          display: flex;
+          justify-content: center;
+          gap: 30px;
+          color: #666;
+          font-size: 13px;
+        }
+        
+        /* الإحصائيات العامة */
+        .global-stats {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 15px;
+          margin-bottom: 30px;
+        }
+        
+        .global-stat-card {
+          background: white;
+          border-radius: 10px;
+          padding: 15px;
+          text-align: center;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+          border: 1px solid #edf2f7;
+        }
+        
+        .global-stat-card.venues {
+          background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        }
+        
+        .global-stat-card.bookings {
+          background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+        }
+        
+        .global-stat-card.guests {
+          background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+        }
+        
+        .global-stat-card.revenue {
+          background: linear-gradient(135deg, #e8eaf6, #c5cae9);
+        }
+        
+        .global-stat-value {
+          font-size: 28px;
+          font-weight: 800;
+          color: #2c3e50;
+          margin: 5px 0;
+        }
+        
+        .global-stat-label {
+          color: #666;
+          font-size: 13px;
+          font-weight: 600;
+        }
+        
+        /* قسم المكان */
+        .venue-section {
+          background: white;
+          border-radius: 12px;
+          margin-bottom: 25px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+          overflow: hidden;
+          border: 1px solid #e9ecef;
+        }
+        
+        .venue-header {
+          background: linear-gradient(135deg, #2c3e50, #34495e);
+          color: white;
+          padding: 15px 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        
+        .venue-header.top-venue {
+          background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+        
+        .venue-title {
+          font-size: 18px;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        
+        .venue-rank {
+          background: rgba(255,255,255,0.2);
+          padding: 4px 10px;
+          border-radius: 20px;
+          font-size: 12px;
+        }
+        
+        .top-badge {
+          background: #ffd700;
+          color: #8a6d2b;
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 12px;
+          font-weight: 700;
+          margin-right: 10px;
+        }
+        
+        .venue-stats-badges {
+          display: flex;
+          gap: 10px;
+        }
+        
+        .stat-badge {
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-size: 12px;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+        
+        .stat-badge i {
+          font-size: 12px;
+        }
+        
+        .bookings-badge {
+          background: #3498db;
+          color: white;
+        }
+        
+        .guests-badge {
+          background: #27ae60;
+          color: white;
+        }
+        
+        .revenue-badge {
+          background: #f39c12;
+          color: white;
+        }
+        
+        /* ملخص المكان */
+        .venue-summary-stats {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 15px;
+          padding: 15px 20px;
+          background: #f8f9fa;
+          border-bottom: 1px solid #e9ecef;
+        }
+        
+        .summary-stat {
+          text-align: center;
+        }
+        
+        .stat-label {
+          display: block;
+          color: #7f8c8d;
+          font-size: 11px;
+          margin-bottom: 5px;
+        }
+        
+        .stat-value {
+          display: block;
+          font-size: 16px;
+          font-weight: 700;
+          color: #2c3e50;
+        }
+        
+        .progress-bar-container {
+          width: 100%;
+          height: 6px;
+          background: #ecf0f1;
+          border-radius: 3px;
+          margin-top: 8px;
+          overflow: hidden;
+        }
+        
+        .progress-bar {
+          height: 100%;
+          background: linear-gradient(90deg, #3498db, #2980b9);
+          border-radius: 3px;
+        }
+        
+        /* جدول الحجوزات */
+        .bookings-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 11px;
+        }
+        
+        .bookings-table th {
+          background: #f1f3f5;
+          padding: 10px;
+          text-align: center;
+          font-weight: 700;
+          color: #2c3e50;
+          border: 1px solid #dee2e6;
+        }
+        
+        .bookings-table td {
+          padding: 8px 10px;
+          border: 1px solid #dee2e6;
+          vertical-align: middle;
+        }
+        
+        .bookings-table tr:nth-child(even) {
+          background: #f8f9fa;
+        }
+        
+        .bookings-table tr:hover {
+          background: #e8f4fd;
+        }
+        
+        .text-center {
+          text-align: center;
+        }
+        
+        .empty {
+          color: #95a5a6;
+          font-style: italic;
+          padding: 20px;
+        }
+        
+        /* الفوتر */
+        .report-footer {
+          text-align: center;
+          margin-top: 30px;
+          padding-top: 15px;
+          border-top: 2px solid #dee2e6;
+          color: #7f8c8d;
+          font-size: 11px;
+        }
+        
+        .footer-info {
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          margin-top: 10px;
+        }
+        
+        /* أزرار التحكم */
+        .controls {
+          text-align: center;
+          margin: 30px 0 20px;
+        }
+        
+        .print-btn {
+          background: #3498db;
+          color: white;
+          border: none;
+          padding: 12px 30px;
+          font-size: 14px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: 600;
+          box-shadow: 0 2px 8px rgba(52,152,219,0.3);
+        }
+        
+        .print-btn:hover {
+          background: #2980b9;
+        }
+        
+        /* تذييل الصفحة */
+        .page-footer {
+          text-align: center;
+          margin-top: 20px;
+          color: #95a5a6;
+          font-size: 10px;
+        }
+      </style>
+    </head>
+    <body>
+      <!-- الترويسة -->
+      <div class="report-header">
+        <h1>
+          <i class="fa fa-map-marker"></i>
+          ${title}
+        </h1>
+        <div class="report-meta">
+          <span><i class="fa fa-calendar"></i> تاريخ التقرير: ${currentDate}</span>
+          <span><i class="fa fa-clock-o"></i> وقت الطباعة: ${currentTime}</span>
+          <span><i class="fa fa-folder-open"></i> إجمالي الحجوزات: ${totalBookingsAll}</span>
+        </div>
+      </div>
+
+      <!-- الإحصائيات العامة -->
+      <div class="global-stats">
+        <div class="global-stat-card venues">
+          <i class="fa fa-map-marker" style="font-size: 24px; color: #1976d2;"></i>
+          <div class="global-stat-value">${totalVenues}</div>
+          <div class="global-stat-label">إجمالي الأماكن</div>
+        </div>
+        
+        <div class="global-stat-card bookings">
+          <i class="fa fa-calendar-check-o" style="font-size: 24px; color: #388e3c;"></i>
+          <div class="global-stat-value">${totalBookingsAll}</div>
+          <div class="global-stat-label">إجمالي الحجوزات</div>
+        </div>
+        
+        <div class="global-stat-card guests">
+          <i class="fa fa-users" style="font-size: 24px; color: #f57c00;"></i>
+          <div class="global-stat-value">${totalGuestsAll}</div>
+          <div class="global-stat-label">إجمالي الضيوف</div>
+        </div>
+        
+        <div class="global-stat-card revenue">
+          <i class="fa fa-money" style="font-size: 24px; color: #5c6bc0;"></i>
+          <div class="global-stat-value">${totalRevenueAll.toLocaleString('ar-EG')}</div>
+          <div class="global-stat-label">إجمالي الإيرادات</div>
+        </div>
+      </div>
+
+      <!-- بطاقات الأماكن -->
+      ${venuesCards}
+
+      <!-- الفوتر -->
+      <div class="report-footer">
+        <p>نظام إدارة الحجوزات - تقرير إحصائيات الأماكن</p>
+        <div class="footer-info">
+          <span>📞 للاستفسار: 01092209699</span>
+          <span>⏰ تاريخ الطباعة: ${currentDate} ${currentTime}</span>
+        </div>
+      </div>
+
+      <!-- أزرار التحكم -->
+      <div class="controls no-print">
+        <button class="print-btn" onclick="window.print()">
+          <i class="fa fa-print"></i> طباعة التقرير
+        </button>
+      </div>
+
+      <script>
+        window.onload = function() {
+          // تفعيل الطباعة التلقائية إذا أردت
+          // setTimeout(() => window.print(), 500);
+        };
+      </script>
+    </body>
+    </html>
+  `;
+}
+
+
+
 }

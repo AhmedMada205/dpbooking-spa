@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:8080',
+  apiUrl: 'http://10.0.0.185:8080',
   TAX_RATE: 0.12,
 };

@@ -1,80 +1,74 @@
-<div class="booking-container container-fluid mt-4" dir="rtl">
-  <div class="card booking-card shadow-lg border-0">
+<div class="booking-wrapper container-fluid px-lg-5 py-4" dir="rtl">
+  <div class="card booking-card shadow border-0">
 
-    <!-- ================= Header ================= -->
-    <div class="card-header booking-header d-flex justify-content-between align-items-center">
+    <!-- ================= HEADER المتطور ================= -->
+    <div class="card-header booking-header d-flex flex-wrap justify-content-between align-items-center px-4 py-3">
       <div class="d-flex align-items-center">
-        <i class="fa fa-calendar-plus fa-lg ml-2"></i>
+        <div class="header-icon ml-3">
+          <i class="fa fa-calendar-plus fa-2x"></i>
+        </div>
         <div>
-          <h5 class="mb-0">إنشاء حجز جديد</h5>
-          <small class="text-white-50">إدارة الحجوزات</small>
+          <h4 class="mb-0 font-weight-bold">إنشاء حجز جديد</h4>
+          <span class="text-white-50 small">إدارة الحجوزات</span>
         </div>
       </div>
-
-      <div>
-        <button class="btn btn-outline-light btn-sm ml-2"
-                routerLink="/dashboard">
+      <div class="mt-2 mt-sm-0">
+        <button class="btn btn-outline-light btn-circle ml-2" routerLink="/dashboard">
           <i class="fa fa-home"></i>
         </button>
-
-        <button class="btn btn-light btn-sm"
-                routerLink="/bookings">
-          <i class="fa fa-arrow-left ml-1"></i>
-          الحجوزات
+        <button class="btn btn-light px-4" routerLink="/bookings">
+          <i class="fa fa-arrow-right ml-1"></i> الحجوزات
         </button>
       </div>
     </div>
 
-    <div class="card-body">
-      <form [formGroup]="bookingForm"
-            (ngSubmit)="submitBooking()"
-            autocomplete="off">
+    <div class="card-body p-4">
+      <form [formGroup]="bookingForm" (ngSubmit)="submitBooking()" autocomplete="off">
 
-        <!-- ================= Client Info ================= -->
-        <div class="section-card">
-          <div class="section-title">
-            <i class="fa fa-user ml-2"></i> معلومات العميل
-          </div>
-
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label required">اسم العميل</label>
-              <input type="text"
-                     class="form-control"
-                     formControlName="clientName"
-                     placeholder="أدخل اسم العميل"
-                     [class.is-invalid]="bookingForm.get('clientName')?.invalid && bookingForm.get('clientName')?.touched">
-              <div class="invalid-feedback">اسم العميل مطلوب</div>
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label class="form-label required">رقم الهاتف</label>
-              <input type="tel"
-                     class="form-control"
-                     formControlName="clientPhone"
-                     placeholder="010xxxxxxxx"
-                     [class.is-invalid]="bookingForm.get('clientPhone')?.invalid && bookingForm.get('clientPhone')?.touched">
-              <div class="invalid-feedback">رقم هاتف صحيح مطلوب</div>
+        <!-- ================= بطاقة العميل ================= -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-4">
+            <h6 class="section-title">
+              <i class="fa fa-user ml-2"></i> معلومات العميل
+            </h6>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label required">اسم العميل</label>
+                <input type="text"
+                       class="form-control"
+                       formControlName="clientName"
+                       placeholder="أدخل اسم العميل"
+                       [class.is-invalid]="bookingForm.get('clientName')?.invalid && bookingForm.get('clientName')?.touched">
+                <div class="invalid-feedback">اسم العميل مطلوب</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label required">رقم الهاتف</label>
+                <input type="tel"
+                       class="form-control"
+                       formControlName="clientPhone"
+                       placeholder="010xxxxxxxx"
+                       [class.is-invalid]="bookingForm.get('clientPhone')?.invalid && bookingForm.get('clientPhone')?.touched">
+                <div class="invalid-feedback">رقم هاتف صحيح مطلوب</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- ================= Booking Info ================= -->
-        <div class="section-card">
-          <div class="section-title">
-            <i class="fa fa-info-circle ml-2"></i> تفاصيل الحجز
-          </div>
-
-          <div class="row">
+        <!-- ================= بطاقة تفاصيل الحجز ================= -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-4">
+            <h6 class="section-title">
+              <i class="fa fa-info-circle ml-2"></i> تفاصيل الحجز
+            </h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label required">نوع الحجز</label>
+                <select class="form-control" formControlName="bookingType">
+                  <option value="Iftar">إفطار رمضان</option>
+                  <option value="Suhur">سحور رمضان</option>
+                </select>
+              </div>
             <div class="col-md-4 mb-3">
-              <label class="form-label required">نوع الحجز</label>
-              <select class="form-control" formControlName="bookingType">
-                <option value="Iftar">إفطار رمضان</option>
-                <option value="Suhur">سحور رمضان</option>
-              </select>
-            </div>
-
-          <div class="col-md-4 mb-3">
   <label class="form-label required">المكان</label>
   <select class="form-control"
           formControlName="venueId"
@@ -86,203 +80,235 @@
   </select>
 </div>
 
-<div class="col-md-4 mb-3" *ngIf="bookingForm.get('venueId')?.value">
-  <label class="form-label">اختيار السعر</label>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="venuePriceOption"
-           [value]="0" (change)="onVenuePriceOptionChange($event)" checked>
-    <label class="form-check-label">مجاني</label>
-  </div>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="venuePriceOption"
-           [value]="1" (change)="onVenuePriceOptionChange($event)">
-    <label class="form-check-label">سعر خاص</label>
+<!-- ===== Venue Price Style Box ===== -->
+<div class="col-md-4 mb-3"
+     *ngIf="bookingForm.get('venueId')?.value">
+
+  <label class="form-label">نوع سعر المكان</label>
+
+  <div class="venue-price-selector">
+
+    <!-- مجاني -->
+    <label class="price-box"
+           [class.active]="!isCustomPrice">
+      <input type="radio"
+             name="venuePriceOption"
+             [value]="0"
+             (change)="onVenuePriceOptionChange($event)">
+      <div class="price-content">
+        <i class="fa fa-gift"></i>
+        <span>مجاني</span>
+      </div>
+    </label>
+
+    <!-- سعر خاص -->
+    <label class="price-box"
+           [class.active]="isCustomPrice">
+      <input type="radio"
+             name="venuePriceOption"
+             [value]="1"
+             (change)="onVenuePriceOptionChange($event)">
+      <div class="price-content">
+        <i class="fa fa-tag"></i>
+        <span>سعر خاص</span>
+      </div>
+    </label>
+
   </div>
 
-  <div class="mt-2" *ngIf="isCustomPrice">
-    <input type="number" class="form-control"
-           formControlName="venueExtraPrice"
-           placeholder="ادخل السعر الخاص">
+  <!-- Custom Price Input -->
+  <div class="custom-price-input mt-3"
+       *ngIf="isCustomPrice">
+    <div class="input-group">
+      <input type="number"
+             class="form-control"
+             formControlName="venueExtraPrice"
+             placeholder="ادخل السعر الخاص">
+      <div class="input-group-append">
+        <span class="input-group-text bg-white">ج.م</span>
+      </div>
+    </div>
   </div>
+
 </div>
-
-            <div class="col-md-4 mb-3">
-              <label class="form-label required">عدد الأفراد</label>
-              <input type="number"
-                     class="form-control"
-                     formControlName="numberOfPeople"
-                     min="1">
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-4 mb-3">
-              <label class="form-label required">تاريخ الحجز</label>
-              <input type="date"
-                     class="form-control"
-                     formControlName="bookingDate"
-                     [min]="todayDate">
-            </div>
-
-            <div class="col-md-4 mb-3">
-              <label class="form-label required">وقت الحجز</label>
-              <input type="time"
-                     class="form-control"
-                     formControlName="bookingTime">
-            </div>
-
-            <div class="col-md-4 mb-3">
-              <label class="form-label required">طريقة الدفع</label>
-              <select class="form-control" formControlName="paymentMethod">
-                <option value="" disabled>اختر طريقة الدفع</option>
-                <option *ngFor="let p of paymentMethods" [value]="p.id">
-                  {{ p.name }}
-                </option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- ================= Payment ================= -->
-        <div class="section-card">
-          <div class="section-title">
-            <i class="fa fa-credit-card ml-2"></i> بيانات الدفع
-          </div>
-
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label required">رقم الإيصال</label>
-              <input type="text"
-                     class="form-control"
-                     formControlName="receiptNumber"
-                     placeholder="رقم الإيصال">
-            </div>
-
-            <div class="col-md-3 mb-3">
-              <label class="form-label">المدفوع مسبقاً</label>
-              <div class="input-group">
+              <div class="col-md-4 mb-3">
+                <label class="form-label required">عدد الأفراد</label>
                 <input type="number"
                        class="form-control"
-                       formControlName="depositAmount"
-                       placeholder="0.00"
-                       min="0">
-                <div class="input-group-append">
-                  <span class="input-group-text">جنيه</span>
-                </div>
+                       formControlName="numberOfPeople"
+                       min="1">
               </div>
-              <small class="text-muted">اختياري</small>
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label class="form-label">ملاحظات</label>
-              <textarea class="form-control"
-                        rows="2"
-                        formControlName="note"
-                        placeholder="ملاحظات إضافية"></textarea>
+              <div class="col-md-4 mb-3">
+                <label class="form-label required">تاريخ الحجز</label>
+                <input type="date"
+                       class="form-control"
+                       formControlName="bookingDate"
+                       [min]="todayDate">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label required">وقت الحجز</label>
+                <input type="time"
+                       class="form-control"
+                       formControlName="bookingTime">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label required">طريقة الدفع</label>
+                <select class="form-control" formControlName="paymentMethod">
+                  <option value="" disabled>اختر طريقة الدفع</option>
+                  <option *ngFor="let p of paymentMethods" [value]="p.id">
+                    {{ p.name }}
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- ================= Meals ================= -->
-        <div class="section-card">
-          <div class="section-title">
-            <i class="fa fa-cutlery ml-2"></i> الوجبات
-          </div>
-
-          <div formArrayName="meals">
-            <div *ngFor="let meal of meals.controls; let i = index"
-                 [formGroupName]="i"
-                 class="meal-card mb-3">
-
-              <div class="d-flex justify-content-between mb-2">
-                <strong>وجبة {{ i + 1 }}</strong>
-                <button type="button"
-                        class="btn btn-sm btn-outline-danger"
-                        (click)="removeMeal(i)"
-                        *ngIf="meals.length > 1">
-                  <i class="fa fa-times"></i>
-                </button>
+        <!-- ================= بطاقة بيانات الدفع ================= -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-4">
+            <h6 class="section-title">
+              <i class="fa fa-credit-card ml-2"></i> بيانات الدفع
+            </h6>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label required">رقم الإيصال</label>
+                <input type="text"
+                       class="form-control"
+                       formControlName="receiptNumber"
+                       placeholder="رقم الإيصال">
               </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">المدفوع مسبقاً</label>
+                <div class="input-group">
+                  <input type="number"
+                         class="form-control"
+                         formControlName="depositAmount"
+                         placeholder="0.00"
+                         min="0">
+                  <div class="input-group-append">
+                    <span class="input-group-text bg-white">جنيه</span>
+                  </div>
+                </div>
+                <small class="text-muted">اختياري</small>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">ملاحظات</label>
+                <textarea class="form-control"
+                          rows="2"
+                          formControlName="note"
+                          placeholder="ملاحظات إضافية"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
 
-              <div class="row align-items-center">
-                <div class="col-md-5 mb-2">
+        <!-- ================= بطاقة الوجبات – تصميم شبكي أنيق ================= -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-4">
+            <h6 class="section-title">
+              <i class="fa fa-cutlery ml-2"></i> الوجبات
+            </h6>
+
+            <div formArrayName="meals">
+              <div *ngFor="let meal of meals.controls; let i = index"
+                   [formGroupName]="i"
+                   class="meal-item row align-items-end g-3 mb-3 p-3 rounded-lg bg-white border">
+                
+                <div class="col-md-5">
+                  <label class="small font-weight-bold text-muted mb-1">الوجبة</label>
                   <select class="form-control"
                           formControlName="MealId"
                           (change)="onMealChange(i)">
                     <option *ngFor="let m of mealsList" [value]="m.mealId">
                       {{ m.mealName }} -
-                      {{
-                        selectedVenueId === 8 && m.specialPrice
-                          ? (m.specialPrice | currency:'EGP':'symbol')
-                          : (m.price | currency:'EGP':'symbol')
-                      }}
+                      {{ (selectedVenueId === 8 && m.specialPrice ? m.specialPrice : m.price) | currency:'EGP':'symbol' }}
                     </option>
                   </select>
                 </div>
 
-                <div class="col-md-3 mb-2">
+                <div class="col-md-3">
+                  <label class="small font-weight-bold text-muted mb-1">الكمية</label>
                   <input type="number"
                          class="form-control"
                          formControlName="Quantity"
                          min="1">
                 </div>
 
-                <div class="col-md-3 mb-2">
-                  <input type="number"
-                         class="form-control"
-                         formControlName="UnitPrice"
-                         min="0"
-                         [readonly]="selectedVenueId === 8">
+                <div class="col-md-2">
+                  <label class="small font-weight-bold text-muted mb-1">السعر</label>
+                  <div class="input-group">
+                    <input type="number"
+                           class="form-control"
+                           formControlName="UnitPrice"
+                           min="0"
+                           [readonly]="selectedVenueId === 8">
+                    <div class="input-group-append">
+                      <span class="input-group-text bg-white">ج.م</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="col-md-1 text-center font-weight-bold text-primary">
-                  {{ getMealTotal(i) | currency:'EGP':'symbol' }}
+                <div class="col-md-2">
+                  <label class="small font-weight-bold text-muted mb-1">الإجمالي</label>
+                  <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded">
+                    <span class="font-weight-bold text-primary">
+                      {{ getMealTotal(i) | currency:'EGP':'symbol' }}
+                    </span>
+                    <button *ngIf="meals.length > 1"
+                            type="button"
+                            class="btn btn-sm text-danger p-0"
+                            (click)="removeMeal(i)">
+                      <i class="fa fa-trash fa-lg"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="text-center">
-            <button type="button"
-                    class="btn btn-outline-primary"
-                    (click)="addMeal()">
-              <i class="fa fa-plus ml-1"></i> إضافة وجبة
-            </button>
+            <div class="text-center mt-3">
+              <button type="button"
+                      class="btn btn-outline-primary px-5 py-2"
+                      (click)="addMeal()">
+                <i class="fa fa-plus ml-1"></i> إضافة وجبة
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- ================= Summary ================= -->
-        <div class="summary-card mt-4">
-          <div class="summary-row">
-            <span>عدد الوجبات</span>
-            <strong>{{ meals.length }}</strong>
+        <!-- ================= بطاقة الملخص – بارزة ومثبتة ================= -->
+        <div class="summary-card shadow-sm mt-4 p-4 rounded-lg">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">عدد الوجبات</span>
+            <strong class="text-dark">{{ meals.length }}</strong>
           </div>
-          <div class="summary-row">
-            <span>إجمالي السعر</span>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">إجمالي الوجبات</span>
             <strong>{{ getTotalMealsPrice() | currency:'EGP':'symbol' }}</strong>
           </div>
-          <div class="summary-row">
-            <span>خدمة 12%</span>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">خدمة 12%</span>
             <strong>{{ getServiceCharge() | currency:'EGP':'symbol' }}</strong>
           </div>
-          <div class="summary-row final">
-            <span>الإجمالي النهائي</span>
-            <strong>{{ getFinalTotal() | currency:'EGP':'symbol' }}</strong>
+          <hr class="my-3">
+          <div class="d-flex justify-content-between">
+            <span class="h6 font-weight-bold mb-0">الإجمالي النهائي</span>
+            <span class="h5 font-weight-bold text-primary">{{ getFinalTotal() | currency:'EGP':'symbol' }}</span>
           </div>
         </div>
 
-        <!-- ================= Actions ================= -->
-        <div class="d-flex justify-content-between mt-4">
+        <!-- ================= أزرار الإجراءات ================= -->
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mt-4">
           <button type="button"
-                  class="btn btn-outline-secondary"
+                  class="btn btn-outline-secondary px-5 mb-2 mb-sm-0"
                   routerLink="/bookings">
             <i class="fa fa-arrow-right ml-1"></i> رجوع
           </button>
-
           <button type="submit"
-                  class="btn btn-success btn-lg"
+                  class="btn btn-success btn-lg px-5"
                   [disabled]="bookingForm.invalid || isSubmitting">
-            <i class="fa fa-save ml-1"></i> إنشاء الحجز
+            <i class="fa" [ngClass]="{'fa-spinner fa-spin': isSubmitting, 'fa-save': !isSubmitting}"></i>
+            {{ isSubmitting ? 'جاري الحفظ...' : 'إنشاء الحجز' }}
           </button>
         </div>
 
